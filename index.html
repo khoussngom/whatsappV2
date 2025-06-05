@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Web</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./src/config-tailwind.js"></script>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<body class="bg-black text-wa-text overflow-hidden">
+    <div id="app" class="flex h-screen ">
+
+        <div class="bg-[#1d1f1f] flex flex-col justify-between w-[5%]">
+            <div class="flex flex-col gap-2 mt-3 items-center">
+                <span class=" flex justify-center items-center  cursor-pointer w-14 h-14  bg-slate-800 text-zinc-50 border rounded-full"><i class='bx bxs-message text-2xl bx-rotate-180' ></i></span>
+                <span class=" flex justify-center items-center cursor-pointer w-14 h-14  bg-slate-800 border text-zinc-50  rounded-full"><i class='bx bx-doughnut-chart text-2xl bx-rotate-180' ></i></span>
+                <span class=" flex justify-center items-center cursor-pointer w-14 h-14  bg-slate-800 border text-zinc-50  rounded-full"><i class='bx bxl-messenger text-2xl bx-rotate-180' ></i></span>
+                <span class=" flex justify-center items-center cursor-pointer w-14 h-14  bg-slate-800 border text-zinc-50  rounded-full"><i class='bx bxs-group text-2xl' ></i></span>
+            </div>
+            <div class="flex flex-col items-center gap-2 mb-2">
+                <span class=" flex justify-center items-center cursor-pointer w-14 h-14  bg-slate-800 border text-zinc-50  rounded-full"><i class='bx bx-wrench text-2xl'></i></span>
+                <span class=" flex justify-center items-center cursor-pointer w-14 h-14  bg-slate-800 border text-zinc-50  rounded-full"><i class='bx bxs-user text-2xl'></i></span>
+            </div>
+        </div>
+
+        <div class="w-[27%] border-r  border-wa-border flex flex-col">
+
+            <div class="p-4 border-wa-border flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <h1 class="text-xl font-normal text-wa-text">WhatsApp</h1>
+                </div>
+                <div class="flex gap-4">
+
+                    <button id="add" class="text-wa-text-secondary hover:bg-wa-text-secondary hover:bg-opacity-10 p-2 rounded-full transition-colors">
+                        <i class='bx bx-plus w-5 h-5'></i>
+                    </button>
+                    <button class="text-wa-text-secondary hover:bg-wa-text-secondary hover:bg-opacity-10 p-2 rounded-full transition-colors">
+                        <i class='bx bx-dots-vertical-rounded w-5 h-5'></i>
+                    </button>
+                </div>
+            </div>
+
+
+            <div class="p-4 ">
+                <div class="bg-gray-900 border-2   rounded-xl flex items-center px-3 py-2">
+                    <i class='bx bx-search w-5 h-5 text-wa-text-secondary mr-3'></i>
+                    <input type="text" placeholder="Rechercher ou démarrer une discussion" class="bg-transparent outline-none flex-1 text-wa-text placeholder-wa-text-secondary">
+                </div>
+            </div>
+
+
+            <div class="px-4 pb-4 ">
+                <div class="flex gap-2">
+                    <button class="bg-wa-hover text-wa-text px-4 py-2 rounded-full text-sm font-medium hover:bg-opacity-80 transition-colors">Toutes</button>
+                    <button class="text-wa-text-secondary px-4 py-2 rounded-full text-sm hover:bg-wa-hover transition-colors">Non lues</button>
+                    <button class="text-wa-text-secondary px-4 py-2 rounded-full text-sm hover:bg-wa-hover transition-colors">Favoris</button>
+                    <button class="text-wa-text-secondary px-4 py-2 rounded-full text-sm hover:bg-wa-hover transition-colors">Groupes</button>
+                </div>
+            </div>
+
+
+
+
+            <div class="flex-1 overflow-y-auto" id="ListeMessages">
+
+            </div>
+        </div>
+
+
+        <div class="flex-1 flex flex-col">
+
+            <div id="welcomeScreen" class="flex-1 flex items-center justify-center flex-col">
+                <div class="text-center mb-8">
+                    <div class="w-64 h-64 mx-auto mb-8 border-2 rounded-full flex items-center justify-center">
+
+                        <i class='bx bx-lock-alt w-100 h-100  text-[40px] text-wa-text-secondary'></i>
+                    </div>
+                    <h2 class="text-3xl text-black text-wa-text mb-4">WhatsApp Web</h2>
+
+                </div>
+                <div class="flex items-center text-wa-text-secondary text-sm">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                    </svg> Vos messages personnels sont chiffrés de bout en bout
+                </div>
+            </div>
+
+            <div id="chatView" class="flex hidden flex-1  flex-col">
+
+                <div class=" p-4 border-b border-wa-border flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-wa-text-secondary rounded-full"></div>
+                        <div>
+                            <div class="font-medium text-wa-text" id="chatContactName">Contact</div>
+                            <div class="text-sm text-wa-text-secondary" id="chatStatus">en ligne</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <button class="text-wa-text-secondary hover:bg-wa-text-secondary hover:bg-opacity-10 p-2 rounded-full">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                            </svg>
+                        </button>
+                        <button class="text-wa-text-secondary hover:bg-wa-text-secondary hover:bg-opacity-10 p-2 rounded-full">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                            </svg>
+                        </button>
+                        <button class="text-wa-text-secondary hover:bg-wa-text-secondary hover:bg-opacity-10 p-2 rounded-full">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+
+                <div class="flex-1 overflow-y-auto p-4 " id="messagesContainer">
+
+                </div>
+
+
+                <div class="p-4 border-t border-wa-border">
+                    <div class="flex items-center gap-4">
+                        <button class="text-wa-text-secondary hover:text-wa-text">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 21c0 .5.4 1 1 1h4c.6 0 1-.5 1-1v-1H9v1zm3-19C8.1 2 5 5.1 5 9c0 2.4 1.2 4.5 3 5.7V17c0 .5.4 1 1 1h6c.6 0 1-.5 1-1v-2.3c1.8-1.3 3-3.4 3-5.7 0-3.9-3.1-7-7-7z"/>
+                            </svg>
+                        </button>
+                        <div class="flex-1 rounded-lg flex items-center px-4 py-2 bg-wa-darker">
+                            <input type="text" placeholder="Tapez un message" class="bg-transparent outline-none flex-1 text-wa-text placeholder-wa-text-secondary" id="messageInput">
+                            <button class="text-wa-text-secondary hover:text-wa-text ml-2">
+
+                                <i class='bx bx-smile w-6 h-6'></i>
+                            </button>
+                        </div>
+                        <button class="text-wa-text-secondary hover:text-wa-text" id="sendButton">
+
+                            <i class='bx bx-send w-6 h-6'></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./src/controllers/controller.js"></script>
+</body>
+
+</html>
