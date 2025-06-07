@@ -30,6 +30,12 @@ export const MessagesController = {
 
                 const contactSauvegarde = await response.json();
                 dbData.contact.push(contactSauvegarde);
+
+                const event = new CustomEvent('donneesMisesAJour', {
+                    detail: dbData
+                });
+                document.dispatchEvent(event);
+
                 return true;
             } catch (error) {
                 console.error('Erreur:', error);
@@ -60,6 +66,19 @@ export const MessagesController = {
 
                 if (!response.ok) throw new Error('Erreur lors de l\'envoi du message');
 
+                // Mettre à jour les données locales
+                const contact = dbData.contact.find(c => c.id === chatId);
+                if (contact) {
+                    contact.messages = [...contact.messages, newMessage];
+                    contact.lastMessage = message;
+                }
+
+                // Déclencher l'événement de mise à jour
+                const event = new CustomEvent('donneesMisesAJour', {
+                    detail: dbData
+                });
+                document.dispatchEvent(event);
+
                 this.afficherMessages(chatId);
                 this.afficherAllMessages();
                 this.simulerReponse(chatId);
@@ -74,7 +93,6 @@ export const MessagesController = {
                 dbData.groupe.find(g => g.id === chatId);
 
             if (chat && chat.messages) {
-                // Créer le HTML pour tous les messages
                 const messagesHTML = chat.messages.map(msg => `
                     <div class="flex ${msg.envoyeur === 'moi' ? 'justify-end' : 'justify-start'} mb-4">
                         <div class="max-w-[70%] bg-${msg.envoyeur === 'moi' ? 'wa-green' : 'wa-darker'} rounded-lg p-3">
@@ -90,10 +108,8 @@ export const MessagesController = {
                     </div>
                 `).join('');
 
-                // Mettre à jour le conteneur de messages
                 messagesContainer.innerHTML = messagesHTML;
 
-                // Faire défiler vers le bas
                 requestAnimationFrame(() => {
                     messagesContainer.scrollTop = messagesContainer.scrollHeight;
                 });
@@ -111,7 +127,6 @@ export const MessagesController = {
             ListeMessages.insertAdjacentHTML('beforeend', messageHTML);
         });
 
-        // Afficher les groupes
         dbData.groupe.forEach(groupe => {
             const messageHTML = Components.ListeMessages({
                 ...groupe,
@@ -145,15 +160,12 @@ export const MessagesController = {
             const chatName = chat.type === 'groupe' ? chat.nom : `${chat.prenom} ${chat.nom}`;
             document.querySelector('#chatContactName').textContent = chatName;
             
-            // Afficher les messages existants
             this.afficherMessages(chatId);
             
-            // Nettoyer et focus l'input
             const messageInput = document.querySelector('#messageInput');
             messageInput.value = '';
             messageInput.focus();
 
-            // Activer le bouton d'envoi
             const sendButton = document.querySelector('#sendButton');
             sendButton.dataset.chatId = chatId;
         }

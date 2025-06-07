@@ -8,11 +8,11 @@ const ListeMessages = document.querySelector("#ListeMessages");
 let currentChatId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Charger les données sauvegardées
+
     MessagesController.chargerDonnees();
     MessagesController.afficherAllMessages();
 
-    // Gestionnaire pour le bouton d'ajout
+
     const addButton = document.querySelector('#add');
     if (addButton) {
         addButton.addEventListener('click', () => {
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Gestionnaire pour les conversations
+
     document.addEventListener('click', (e) => {
         const chatItem = e.target.closest('.chat-item');
         if (chatItem) {
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Gestionnaires pour l'envoi de messages
+
     const messageInput = document.querySelector('#messageInput');
     const sendButton = document.querySelector('#sendButton');
 
@@ -56,9 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Écouter les mises à jour des données
     document.addEventListener('donneesMisesAJour', (e) => {
-        // Mettre à jour l'interface si nécessaire
         if (ListeMessages.querySelector('.chat-item')) {
             ListeMessages.innerHTML = ComponentsAdd.nouveauMenu(e.detail);
             attacherGestionnairesMenu();
@@ -66,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Fonction pour attacher les gestionnaires d'événements au menu
 function attacherGestionnairesMenu() {
     const backButton = document.querySelector('#backButton');
     const newGroup = document.querySelector('#newGroup');
@@ -82,7 +79,6 @@ function attacherGestionnairesMenu() {
     if (newGroup) {
         newGroup.addEventListener('click', () => {
             console.log('Création de groupe');
-            // TODO: Implémenter la création de groupe
         });
     }
 
@@ -96,12 +92,10 @@ function attacherGestionnairesMenu() {
     if (newCommunity) {
         newCommunity.addEventListener('click', () => {
             console.log('Création de communauté');
-            // TODO: Implémenter la création de communauté
         });
     }
 }
 
-// Fonction pour attacher les gestionnaires au formulaire de contact
 function attacherGestionnairesContact() {
     const popup = document.querySelector('.fixed');
     const contactForm = document.querySelector('#contactForm');
