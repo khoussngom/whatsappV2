@@ -66,14 +66,12 @@ export const MessagesController = {
 
                 if (!response.ok) throw new Error('Erreur lors de l\'envoi du message');
 
-                // Mettre à jour les données locales
                 const contact = dbData.contact.find(c => c.id === chatId);
                 if (contact) {
                     contact.messages = [...contact.messages, newMessage];
                     contact.lastMessage = message;
                 }
 
-                // Déclencher l'événement de mise à jour
                 const event = new CustomEvent('donneesMisesAJour', {
                     detail: dbData
                 });
