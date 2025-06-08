@@ -3,21 +3,111 @@ import { ComponentsAdd } from '../components/componentsAdd';
 import { ComponentController } from '../components/componentController';
 import { MessagesController } from './message.js';
 import dbData from '../database/db.json';
+import { ServiceValidation } from '../services/service.js';
+
+const popupConnexion = document.querySelector("#popupConnexion");
+const btnConnexion = document.querySelector("#btnConnexion");
+
+
+const afficherErreur = (message, elementId) => {
+    const errorElement = document.querySelector(`#${elementId}Error`);
+    errorElement.textContent = message;
+    errorElement.classList.remove('hidden');
+};
+
+const cacherErreur = (elementId) => {
+    const errorElement = document.querySelector(`#${elementId}Error`);
+    errorElement.classList.add('hidden');
+};
+
+const connexion = async(e) => {
+    e.preventDefault();
+    const username = document.querySelector("#username").value;
+    const password = document.querySelector("#password").value;
+
+    try {
+        await ServiceValidation.validerNumero(username);
+        cacherErreur('username');
+
+        const response = await fetch(`http://localhost:3000/utilisateurs?numero=${username}&password=${password}`);
+        const utilisateurs = await response.json();
+
+        if (utilisateurs.length === 0) {
+            const nouvelUtilisateur = {
+                id: username,
+                numero: username,
+                password: password,
+                contacts: [],
+                groupes: [],
+                messages: []
+            };
+
+            await ServiceValidation.verifierNumeroExistant(username);
+
+            const createResponse = await fetch('http://localhost:3000/utilisateurs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(nouvelUtilisateur)
+            });
+
+            if (!createResponse.ok) {
+                throw new Error("Erreur lors de la création du compte");
+            }
+        }
+
+        popupConnexion.classList.replace("flex", "hidden");
+        sessionStorage.setItem("isLoggedIn", true);
+        sessionStorage.setItem("username", username);
+        sessionStorage.setItem("userId", username);
+
+        await MessagesController.chargerDonnees();
+        MessagesController.afficherAllMessages();
+
+    } catch (error) {
+        afficherErreur(error.message, 'username');
+    }
+}
+
+const verifierConnexion = async function() {
+    const est_connecte = sessionStorage.getItem("isLoggedIn");
+    if (est_connecte) {
+        popupConnexion.classList.replace("flex", "hidden");
+
+        await MessagesController.chargerDonnees();
+        MessagesController.afficherAllMessages();
+    }
+}
+
+btnConnexion.addEventListener("click", connexion)
+document.addEventListener("DOMContentLoaded", verifierConnexion);
+
+const logoutBtn = document.querySelector("#logoutBtn");
+
+const BtnDeconnexion = () => {
+
+    sessionStorage.removeItem('isLoggedIn');
+    sessionStorage.removeItem('username');
+    popupConnexion.classList.replace("hidden", "flex");
+
+
+};
+
+logoutBtn.addEventListener('click', BtnDeconnexion);
 
 const ListeMessages = document.querySelector("#ListeMessages");
 let currentChatId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    MessagesController.chargerDonnees();
-    MessagesController.afficherAllMessages();
-
-
     const addButton = document.querySelector('#add');
     if (addButton) {
         addButton.addEventListener('click', () => {
-            ListeMessages.innerHTML = ComponentsAdd.nouveauMenu(dbData);
-            attacherGestionnairesMenu();
+            if (dbData.contact || dbData.groupe) {
+                ListeMessages.innerHTML = ComponentsAdd.nouveauMenu(dbData);
+                attacherGestionnairesMenu();
+            }
         });
     }
 
