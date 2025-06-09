@@ -16,7 +16,6 @@ export const MessageSimulator = {
     },
 
     async simulerReponse(chatId) {
-        // Attendre entre 1 et 3 secondes
         const delai = Math.floor(Math.random() * 2000) + 1000;
         await new Promise(resolve => setTimeout(resolve, delai));
         return this.getRandomReponse();
