@@ -1,0 +1,18 @@
+.menu-contextuel {
+    position: fixed;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.menu-contextuel-option {
+    padding: 8px 15px;
+    cursor: pointer;
+}
+
+.menu-contextuel-option:hover {
+    background-color: #f0f0f0;
+}

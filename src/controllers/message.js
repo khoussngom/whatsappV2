@@ -4,58 +4,6 @@ import dbData from '../database/db.json';
 const ListeMessages = document.querySelector("#ListeMessages");
 
 export const MessagesController = {
-        async chargerDonnees() {
-            try {
-                const userId = sessionStorage.getItem("userId");
-                const response = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
-                const utilisateur = await response.json();
-
-
-                if (utilisateur) {
-                    dbData.contact = utilisateur.contacts || [];
-                    dbData.groupe = utilisateur.groupes || [];
-                    return true;
-                }
-                return false;
-            } catch (error) {
-                console.error('Erreur lors du chargement:', error);
-                return false;
-            }
-        },
-
-        async sauvegarderContact(nouveauContact) {
-            try {
-                const userId = sessionStorage.getItem("userId");
-                const response = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
-                const utilisateur = await response.json();
-
-                utilisateur.contacts.push(nouveauContact);
-
-                const updateResponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        contacts: utilisateur.contacts
-                    })
-                });
-
-                if (!updateResponse.ok) throw new Error('Erreur lors de la sauvegarde');
-
-                dbData.contact = utilisateur.contacts;
-
-                const event = new CustomEvent('donneesMisesAJour', {
-                    detail: dbData
-                });
-                document.dispatchEvent(event);
-
-                return true;
-            } catch (error) {
-                console.error('Erreur:', error);
-                return false;
-            }
-        },
 
         async envoyerMessage(chatId, message) {
             const newMessage = {

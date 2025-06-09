@@ -4,6 +4,7 @@ import { ComponentController } from '../components/componentController';
 import { MessagesController } from './message.js';
 import dbData from '../database/db.json';
 import { ServiceValidation } from '../services/service.js';
+import { contact } from '../models/contact.js';
 
 const popupConnexion = document.querySelector("#popupConnexion");
 const btnConnexion = document.querySelector("#btnConnexion");
@@ -62,7 +63,7 @@ const connexion = async(e) => {
         sessionStorage.setItem("username", username);
         sessionStorage.setItem("userId", username);
 
-        await MessagesController.chargerDonnees();
+        await contact.chargerDonnees();
         MessagesController.afficherAllMessages();
 
     } catch (error) {
@@ -75,7 +76,7 @@ const verifierConnexion = async function() {
     if (est_connecte) {
         popupConnexion.classList.replace("flex", "hidden");
 
-        await MessagesController.chargerDonnees();
+        await contact.chargerDonnees();
         MessagesController.afficherAllMessages();
     }
 }
@@ -219,7 +220,7 @@ function attacherGestionnairesContact() {
             };
 
             try {
-                const succes = await MessagesController.sauvegarderContact(nouveauContact);
+                const succes = await contact.sauvegarderContact(nouveauContact);
                 if (succes) {
                     fermerPopup();
                     ListeMessages.innerHTML = ComponentsAdd.nouveauMenu(dbData);
