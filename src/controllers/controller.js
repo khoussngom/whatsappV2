@@ -22,7 +22,9 @@ const cacherErreur = (elementId) => {
 };
 
 const connexion = async(e) => {
+    console.log("Fonction connexion appelée");
     e.preventDefault();
+
     const username = document.querySelector("#username").value;
     const password = document.querySelector("#password").value;
 
@@ -30,59 +32,65 @@ const connexion = async(e) => {
         await ServiceValidation.validerNumero(username);
         cacherErreur('username');
 
-        const response = await fetch(`http://localhost:3000/utilisateurs?numero=${username}&password=${password}`);
+        const response = await fetch(`http://localhost:3000/utilisateurs?numero=${username}`);
+        if (!response.ok) throw new Error("Erreur de connexion au serveur");
+
         const utilisateurs = await response.json();
+        const utilisateur = utilisateurs.find(u => u.numero === username && u.password === password);
 
-        if (utilisateurs.length === 0) {
-            const nouvelUtilisateur = {
-                id: username,
-                numero: username,
-                password: password,
-                contacts: [],
-                groupes: [],
-                messages: []
-            };
-
-            await ServiceValidation.verifierNumeroExistant(username);
-
-            const createResponse = await fetch('http://localhost:3000/utilisateurs', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(nouvelUtilisateur)
-            });
-
-            if (!createResponse.ok) {
-                throw new Error("Erreur lors de la création du compte");
-            }
+        if (!utilisateur) {
+            throw new Error("Numéro ou mot de passe incorrect");
         }
 
-        popupConnexion.classList.replace("flex", "hidden");
-        sessionStorage.setItem("isLoggedIn", true);
+        sessionStorage.setItem("isLoggedIn", "true");
         sessionStorage.setItem("username", username);
-        sessionStorage.setItem("userId", username);
+        sessionStorage.setItem("userId", utilisateur.id);
+
+        popupConnexion.classList.replace("flex", "hidden");
 
         await contact.chargerDonnees();
         MessagesController.afficherAllMessages();
 
     } catch (error) {
+        console.error("Erreur de connexion:", error);
         afficherErreur(error.message, 'username');
     }
 }
 
 const verifierConnexion = async function() {
     const est_connecte = sessionStorage.getItem("isLoggedIn");
-    if (est_connecte) {
-        popupConnexion.classList.replace("flex", "hidden");
+    const userId = sessionStorage.getItem("userId");
 
-        await contact.chargerDonnees();
-        MessagesController.afficherAllMessages();
+    console.log("Vérification connexion:", { est_connecte, userId });
+
+    if (est_connecte === "true" && userId) {
+        popupConnexion.classList.replace("flex", "hidden");
+        try {
+            await contact.chargerDonnees();
+            MessagesController.afficherAllMessages();
+        } catch (error) {
+            console.error("Erreur lors de la vérification:", error);
+
+            sessionStorage.clear();
+            popupConnexion.classList.replace("hidden", "flex");
+        }
     }
 }
 
-btnConnexion.addEventListener("click", connexion)
-document.addEventListener("DOMContentLoaded", verifierConnexion);
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("DOM chargé");
+
+
+    const formConnexion = document.querySelector("#formConnexion");
+    if (formConnexion) {
+        formConnexion.addEventListener("submit", connexion);
+        console.log("Événement de connexion attaché au formulaire");
+    } else {
+        console.error("Formulaire de connexion non trouvé");
+    }
+
+    verifierConnexion();
+});
 
 const logoutBtn = document.querySelector("#logoutBtn");
 
