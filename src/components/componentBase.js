@@ -1,28 +1,11 @@
 export const Components = {
         ListeMessages: (chat) => {
-                const getTypeIcon = (type) => {
-                    switch (type) {
-                        case 'group':
-                            return `<svg class="w-5 h-5 text-wa-text-secondary" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H17c-.8 0-1.54.37-2.01.99L12 13v7h8zM12.5 11.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5S11 9.17 11 10s.67 1.5 1.5 1.5zM5.5 6c1.11 0 2-.89 2-2s-.89-2-2-2-2 .89-2 2 .89 2 2 2zm1.5 15v-7H9V9.5C9 8.12 7.88 7 6.5 7S4 8.12 4 9.5V14h2v7h1.5z"/>
-                    </svg>`;
-                        case 'business':
-                            return `<svg class="w-5 h-5 text-wa-text-secondary" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                    </svg>`;
-                        default:
-                            return '';
-                    }
-                };
-
                 return `
-        <div class="flex items-center p-4 hover:bg-wa-hover cursor-pointer transition-colors border-b border-wa-border chat-item" data-chat-id="${chat.id}">
+        <div class="flex items-center p-4 hover:bg-wa-hover cursor-pointer relative chat-item" data-chat-id="${chat.id}">
             <div class="relative mr-4">
                 <div class="w-12 h-12 bg-wa-text-secondary rounded-full flex items-center justify-center">
-                    ${chat.type === 'group' ?
-                        `<svg class="w-6 h-6 text-wa-text" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H17c-.8 0-1.54.37-2.01.99L12 13v7h8zM12.5 11.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5S11 9.17 11 10s.67 1.5 1.5 1.5zM5.5 6c1.11 0 2-.89 2-2s-.89-2-2-2-2 .89-2 2 .89 2 2 2zm1.5 15v-7H9V9.5C9 8.12 7.88 7 6.5 7S4 8.12 4 9.5V14h2v7h1.5z"/>
-                        </svg>` :
+                    ${chat.type === 'groupe' ? 
+                        `<i class='bx bxs-group text-2xl text-wa-text'></i>` : 
                         `<i class='bx bxs-user text-2xl text-wa-text'></i>`
                     }
                 </div>
@@ -32,8 +15,17 @@ export const Components = {
                     <div class="font-medium text-wa-text truncate">
                         ${chat.type === 'groupe' ? chat.nom : `${chat.prenom} ${chat.nom}`}
                     </div>
-                    <div class="text-xs text-wa-text-secondary">
-                        ${new Date(chat.messages?.[chat.messages?.length - 1]?.timestamp || Date.now()).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-wa-text-secondary">
+                            ${chat.messages && chat.messages.length > 0 ? 
+                                new Date(chat.messages[chat.messages.length - 1].timestamp)
+                                    .toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'}) : 
+                                ''
+                            }
+                        </span>
+                        <button class="menu-trigger p-2 hover:bg-wa-hover rounded-full" data-chat-id="${chat.id}">
+                            <i class='bx bx-chevron-down text-xl text-wa-text-secondary'></i>
+                        </button>
                     </div>
                 </div>
                 <div class="flex items-center justify-between">
@@ -41,9 +33,117 @@ export const Components = {
                         ${chat.lastMessage || ''}
                     </div>
                     ${chat.nbreNonLu > 0 ? `
-                    <div class="bg-wa-green text-white rounded-full min-w-5 h-5 flex items-center justify-center text-xs font-medium px-1">
-                        ${chat.nbreNonLu}
-                    </div>` : ''}
+                        <div class="bg-wa-green text-white rounded-full min-w-5 h-5 flex items-center justify-center text-xs font-medium px-1">
+                            ${chat.nbreNonLu}
+                        </div>` : ''
+                    }
+                </div>
+            </div>
+        </div>`;
+    },
+
+    ConversationActive: (chat) => {
+        return `
+        <div class="flex flex-col h-full">
+            <div class="bg-wa-container p-4 flex items-center border-b border-wa-border">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-wa-text-secondary rounded-full flex items-center justify-center mr-3">
+                        <i class='bx bxs-user text-xl text-wa-text'></i>
+                    </div>
+                    <div class="text-wa-text font-medium">${chat.prenom} ${chat.nom}</div>
+                </div>
+            </div>
+
+            <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 bg-wa-background">
+                ${chat.messages ? chat.messages.map(msg => `
+                    <div class="flex ${msg.envoyeur === 'moi' ? 'justify-end' : 'justify-start'} mb-4">
+                        <div class="max-w-[70%] ${msg.envoyeur === 'moi' ? 'bg-wa-green' : 'bg-wa-darker'} rounded-lg p-3">
+                            <div class="text-wa-text break-words">${msg.texte}</div>
+                            <div class="text-xs text-wa-text-secondary text-right mt-1 flex items-center justify-end gap-1">
+                                ${new Date(msg.timestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
+                                ${msg.envoyeur === 'moi' ? `<i class='bx bx-check'></i>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `).join('') : ''}
+            </div>
+
+            <div class="p-4 border-t border-wa-border bg-wa-container">
+                <div id="messageBox" class="flex items-center gap-4">
+                    <div class="flex-1 rounded-lg bg-wa-darker">
+                        <input type="text" 
+                            id="messageInput" 
+                            class="w-full bg-transparent outline-none px-4 py-2 text-wa-text placeholder-wa-text-secondary"
+                            placeholder="Tapez un message"
+                            autocomplete="off">
+                    </div>
+                    <button id="sendMessageBtn" 
+                        class="text-wa-green hover:text-wa-green-dark transition-colors p-2">
+                        <i class='bx bx-send text-2xl'></i>
+                    </button>
+                </div>
+            </div>
+        </div>`;
+    },
+
+    AjoutContact: ({ mode = 'creation', contact = null }) => {
+        return `
+        <div class="h-full flex flex-col bg-wa-container">
+            <div class="bg-wa-container p-4 flex items-center border-b border-wa-border">
+                <button class="text-wa-text hover:bg-wa-hover p-2 rounded-full" id="retour-liste">
+                    <i class='bx bx-arrow-back text-2xl'></i>
+                </button>
+                <h2 class="text-wa-text ml-4 text-xl">
+                    ${mode === 'edition' ? 'Modifier le contact' : 'Nouveau contact'}
+                </h2>
+            </div>
+            <div class="flex-1 p-6">
+                <form id="form-contact" class="space-y-6">
+                    <div>
+                        <label class="block text-wa-text mb-2">Prénom</label>
+                        <input type="text" name="prenom" 
+                            value="${contact?.prenom || ''}"
+                            class="w-full bg-wa-darker text-wa-text p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-wa-green"
+                            required>
+                    </div>
+                    <div>
+                        <label class="block text-wa-text mb-2">Nom</label>
+                        <input type="text" name="nom" 
+                            value="${contact?.nom || ''}"
+                            class="w-full bg-wa-darker text-wa-text p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-wa-green"
+                            required>
+                    </div>
+                    <div>
+                        <label class="block text-wa-text mb-2">Téléphone</label>
+                        <input type="tel" name="numero" 
+                            value="${contact?.numero || ''}"
+                            class="w-full bg-wa-darker text-wa-text p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-wa-green"
+                            required>
+                    </div>
+                    <button type="submit" 
+                        class="w-full bg-wa-green text-white py-3 rounded-lg hover:bg-opacity-80">
+                        ${mode === 'edition' ? 'Modifier' : 'Ajouter'}
+                    </button>
+                </form>
+            </div>
+        </div>`;
+    },
+
+    PopupSuppression: (chatId) => {
+        return `
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" id="popup-overlay">
+            <div class="bg-wa-container rounded-lg p-6 max-w-sm w-full m-4">
+                <h3 class="text-wa-text text-lg font-medium mb-4">Supprimer le contact</h3>
+                <p class="text-wa-text-secondary mb-6">Êtes-vous sûr de vouloir supprimer ce contact ?</p>
+                <div class="flex justify-end gap-4">
+                    <button class="px-4 py-2 text-wa-text hover:bg-wa-hover rounded" id="annuler-suppression">
+                        Annuler
+                    </button>
+                    <button class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700" 
+                        id="confirmer-suppression" 
+                        data-chat-id="${chatId}">
+                        Supprimer
+                    </button>
                 </div>
             </div>
         </div>`;

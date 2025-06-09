@@ -1,18 +1,59 @@
 .menu-contextuel {
-    position: fixed;
-    background: white;
-    border: 1px solid #ddd;
+    position: absolute;
+    /* Changé de fixed à absolute */
+    background: #2a2f32;
+    border: 1px solid #374045;
     border-radius: 4px;
     padding: 5px 0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    /* Augmenté pour s'assurer qu'il est au-dessus des autres éléments */
+    min-width: 180px;
+    display: block;
+    /* Ajouté pour s'assurer de la visibilité */
 }
 
 .menu-contextuel-option {
     padding: 8px 15px;
     cursor: pointer;
+    color: #e9edef;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
 }
 
 .menu-contextuel-option:hover {
-    background-color: #f0f0f0;
+    background-color: #374045;
+}
+
+.menu-contextuel-option i {
+    font-size: 18px;
+}
+
+#popup-overlay {
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+#popup-overlay>div {
+    animation: slideUp 0.2s ease-in-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }

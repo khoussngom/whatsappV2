@@ -124,123 +124,324 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', (e) => {
         const chatItem = e.target.closest('.chat-item');
         if (chatItem) {
-            currentChatId = chatItem.dataset.chatId;
-            MessagesController.afficherConversation(currentChatId);
+            const chatId = chatItem.dataset.chatId;
+            MessagesController.definirChatActif(chatId);
+            MessagesController.afficherConversation(chatId);
         }
     });
 
-
-    const messageInput = document.querySelector('#messageInput');
-    const sendButton = document.querySelector('#sendButton');
-
-    const envoyerMessage = () => {
+    const handleSendMessage = async() => {
+        const messageInput = document.querySelector('#messageInput');
         const message = messageInput.value.trim();
-        if (message && currentChatId) {
+
+        if (!message) return;
+
+        if (!MessagesController.chatActif) {
+            console.error('Aucune conversation active');
+            return;
+        }
+
+        const success = await MessagesController.envoyerMessage(message);
+        if (success) {
+            console.log('Message envoyé avec succès');
             messageInput.value = '';
             messageInput.focus();
-            MessagesController.envoyerMessage(currentChatId, message);
         }
     };
 
-    if (sendButton) {
-        sendButton.addEventListener('click', envoyerMessage);
-    }
+    document.addEventListener('click', async(e) => {
+        if (e.target.id === 'sendMessageBtn' || e.target.closest('#sendMessageBtn')) {
+            await handleSendMessage();
+        }
+    });
 
-    if (messageInput) {
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                envoyerMessage();
-            }
-        });
-    }
-
-    document.addEventListener('donneesMisesAJour', (e) => {
-        if (ListeMessages.querySelector('.chat-item')) {
-            ListeMessages.innerHTML = ComponentsAdd.nouveauMenu(e.detail);
-            attacherGestionnairesMenu();
+    document.addEventListener('keypress', async(e) => {
+        if (e.target.id === 'messageInput' && e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            await handleSendMessage();
         }
     });
 });
 
-function attacherGestionnairesMenu() {
-    const backButton = document.querySelector('#backButton');
-    const newGroup = document.querySelector('#newGroup');
-    const newContact = document.querySelector('#newContact');
-    const newCommunity = document.querySelector('#newCommunity');
+document.addEventListener('click', (e) => {
+    const menuExistant = document.querySelector('.menu-contextuel');
+    if (menuExistant && !e.target.closest('.menu-contextuel')) {
+        menuExistant.remove();
+    }
 
-    if (backButton) {
-        backButton.addEventListener('click', () => {
-            MessagesController.afficherAllMessages();
+
+    const trigger = e.target.closest('.menu-trigger');
+    if (trigger) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const chatId = trigger.dataset.chatId;
+
+
+        if (menuExistant) {
+            menuExistant.remove();
+        }
+
+
+        const menu = document.createElement('div');
+        menu.className = 'menu-contextuel';
+        menu.innerHTML = `
+            <div class="menu-contextuel-option modifier-contact" data-chat-id="${chatId}">
+                <i class='bx bx-edit mr-2'></i> Modifier le contact
+            </div>
+            <div class="menu-contextuel-option supprimer-contact" data-chat-id="${chatId}">
+                <i class='bx bx-trash mr-2'></i> Supprimer le contact
+            </div>
+        `;
+
+        const rect = trigger.getBoundingClientRect();
+        const parentRect = trigger.closest('.chat-item').getBoundingClientRect();
+
+        menu.style.top = `${rect.bottom - parentRect.top}px`;
+        menu.style.left = `${rect.left - parentRect.left}px`;
+
+        trigger.closest('.chat-item').appendChild(menu);
+
+        menu.querySelector('.modifier-contact').addEventListener('click', () => {
+            console.log('Modifier contact:', chatId);
+            menu.remove();
         });
-    }
 
-    if (newGroup) {
-        newGroup.addEventListener('click', () => {
-            console.log('Création de groupe');
-        });
-    }
-
-    if (newContact) {
-        newContact.addEventListener('click', () => {
-            document.body.insertAdjacentHTML('beforeend', ComponentsAdd.popupNouveauContact());
-            attacherGestionnairesContact();
-        });
-    }
-
-    if (newCommunity) {
-        newCommunity.addEventListener('click', () => {
-            console.log('Création de communauté');
-        });
-    }
-}
-
-function attacherGestionnairesContact() {
-    const popup = document.querySelector('.fixed');
-    const contactForm = document.querySelector('#contactForm');
-    const closePopup = document.querySelector('#closePopup');
-    const cancelButton = document.querySelector('#cancelButton');
-
-    const fermerPopup = () => popup.remove();
-
-    if (closePopup) {
-        closePopup.addEventListener('click', fermerPopup);
-    }
-    if (cancelButton) {
-        cancelButton.addEventListener('click', fermerPopup);
-    }
-
-    if (contactForm) {
-        contactForm.addEventListener('submit', async(e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-
-            const nouveauContact = {
-                id: formData.get('numero'),
-                numero: formData.get('numero'),
-                prenom: formData.get('prenom'),
-                nom: formData.get('nom'),
-                lastMessage: "",
-                nbreNonLu: 0,
-                messages: [],
-                epingler: false,
-                archiver: false
-            };
+        menu.querySelector('.supprimer-contact').addEventListener('click', async() => {
 
             try {
-                const succes = await contact.sauvegarderContact(nouveauContact);
-                if (succes) {
-                    fermerPopup();
-                    ListeMessages.innerHTML = ComponentsAdd.nouveauMenu(dbData);
-                    attacherGestionnairesMenu();
-                    alert('Contact ajouté avec succès !');
-                } else {
-                    throw new Error('Échec de la sauvegarde');
-                }
+                await supprimerContact(chatId);
+                menu.remove();
+                MessagesController.afficherAllMessages();
             } catch (error) {
-                console.error('Erreur:', error);
-                alert('Une erreur est survenue lors de l\'enregistrement du contact');
+                console.error('Erreur lors de la suppression:', error);
             }
         });
     }
-}
+});
+
+document.body.addEventListener('click', async(e) => {
+
+    if (e.target.closest('.modifier-contact')) {
+        const chatId = e.target.closest('.modifier-contact').dataset.chatId;
+
+
+        const contactToEdit = dbData.contact.find(c => c.id === chatId);
+
+        if (contactToEdit) {
+
+            ListeMessages.innerHTML = Components.AjoutContact({
+                mode: 'edition',
+                contact: contactToEdit
+            });
+
+            const formContact = document.querySelector('#form-contact');
+            const retourListe = document.querySelector('#retour-liste');
+
+            if (formContact) {
+                formContact.addEventListener('submit', async(e) => {
+                    e.preventDefault();
+                    const formData = new FormData(formContact);
+
+                    const contactModifie = {
+                        id: chatId,
+                        prenom: formData.get('prenom'),
+                        nom: formData.get('nom'),
+                        numero: formData.get('telephone')
+                    };
+
+                    try {
+                        const success = await contact.modifierContact(chatId, contactModifie);
+                        if (success) {
+                            MessagesController.afficherAllMessages();
+                        }
+                    } catch (error) {
+                        console.error('Erreur lors de la modification:', error);
+                    }
+                });
+            }
+
+            if (retourListe) {
+                retourListe.addEventListener('click', () => {
+                    MessagesController.afficherAllMessages();
+                });
+            }
+        }
+
+        const menuContextuel = document.querySelector('.menu-contextuel');
+        if (menuContextuel) {
+            menuContextuel.remove();
+        }
+    }
+
+    if (e.target.closest('.supprimer-contact')) {
+        const chatId = e.target.closest('.supprimer-contact').dataset.chatId;
+
+        document.body.insertAdjacentHTML('beforeend', Components.PopupSuppression(chatId));
+
+        const menuContextuel = document.querySelector('.menu-contextuel');
+        if (menuContextuel) {
+            menuContextuel.remove();
+        }
+    }
+
+    if (e.target.id === 'annuler-suppression') {
+        const popup = document.querySelector('#popup-overlay');
+        if (popup) {
+            popup.remove();
+        }
+    }
+
+    if (e.target.id === 'confirmer-suppression') {
+        const chatId = e.target.dataset.chatId;
+        const userId = sessionStorage.getItem('userId');
+
+        try {
+            const response = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
+            if (!response.ok) throw new Error('Erreur de récupération des données');
+
+            const userData = await response.json();
+
+            userData.contacts = userData.contacts.filter(c => c.id !== chatId);
+
+            const updateResponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contacts: userData.contacts
+                })
+            });
+
+            if (!updateResponse.ok) throw new Error('Erreur lors de la suppression');
+
+            const popup = document.querySelector('#popup-overlay');
+            if (popup) {
+                popup.remove();
+            }
+
+            MessagesController.afficherAllMessages();
+
+        } catch (error) {
+            console.error('Erreur lors de la suppression:', error);
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM chargé");
+
+
+    const formConnexion = document.querySelector("#formConnexion");
+    if (formConnexion) {
+        formConnexion.addEventListener("submit", connexion);
+        console.log("Événement de connexion attaché au formulaire");
+    } else {
+        console.error("Formulaire de connexion non trouvé");
+    }
+
+    verifierConnexion();
+});
+
+document.addEventListener('click', (e) => {
+    const chatItem = e.target.closest('.chat-item');
+    if (chatItem) {
+        const chatId = chatItem.dataset.chatId;
+        MessagesController.afficherConversation(chatId);
+    }
+});
+
+document.addEventListener('click', async(e) => {
+    if (e.target.id === 'newContact' || e.target.closest('#newContact')) {
+        const ListeMessages = document.querySelector('#ListeMessages');
+        ListeMessages.innerHTML = Components.AjoutContact({ mode: 'creation' });
+
+        const formContact = document.querySelector('#form-contact');
+        const retourListe = document.querySelector('#retour-liste');
+
+        if (formContact) {
+            formContact.addEventListener('submit', async(e) => {
+                e.preventDefault();
+                const formData = new FormData(formContact);
+
+                const nouveauContact = {
+                    id: formData.get('numero'),
+                    numero: formData.get('numero'),
+                    prenom: formData.get('prenom'),
+                    nom: formData.get('nom'),
+                    lastMessage: "",
+                    nbreNonLu: 0,
+                    messages: [],
+                    epingler: false,
+                    archiver: false
+                };
+
+                try {
+                    const success = await contact.sauvegarderContact(nouveauContact);
+                    if (success) {
+                        MessagesController.afficherAllMessages();
+                    }
+                } catch (error) {
+                    console.error('Erreur lors de l\'ajout:', error);
+                }
+            });
+        }
+
+        if (retourListe) {
+            retourListe.addEventListener('click', () => {
+                MessagesController.afficherAllMessages();
+            });
+        }
+    }
+
+    if (e.target.closest('.modifier-contact')) {
+        const chatId = e.target.closest('.modifier-contact').dataset.chatId;
+        const contactToEdit = dbData.contact.find(c => c.id === chatId);
+
+        if (contactToEdit) {
+            const ListeMessages = document.querySelector('#ListeMessages');
+            ListeMessages.innerHTML = Components.AjoutContact({
+                mode: 'edition',
+                contact: contactToEdit
+            });
+
+            const formContact = document.querySelector('#form-contact');
+            const retourListe = document.querySelector('#retour-liste');
+
+            if (formContact) {
+                formContact.addEventListener('submit', async(e) => {
+                    e.preventDefault();
+                    const formData = new FormData(formContact);
+
+                    const contactModifie = {
+                        id: chatId,
+                        numero: formData.get('numero'),
+                        prenom: formData.get('prenom'),
+                        nom: formData.get('nom')
+                    };
+
+                    try {
+                        const success = await contact.modifierContact(chatId, contactModifie);
+                        if (success) {
+                            MessagesController.afficherAllMessages();
+                        }
+                    } catch (error) {
+                        console.error('Erreur lors de la modification:', error);
+                    }
+                });
+            }
+
+            if (retourListe) {
+                retourListe.addEventListener('click', () => {
+                    MessagesController.afficherAllMessages();
+                });
+            }
+        }
+
+        const menuContextuel = document.querySelector('.menu-contextuel');
+        if (menuContextuel) {
+            menuContextuel.remove();
+        }
+    }
+});
