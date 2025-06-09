@@ -16,7 +16,6 @@ export const MessageSimulator = {
     },
 
     async simulerReponse(chatId) {
-        ok
         const delai = Math.floor(Math.random() * 2000) + 1000;
         await new Promise(resolve => setTimeout(resolve, delai));
         return this.getRandomReponse();
