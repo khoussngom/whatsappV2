@@ -126,7 +126,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const handleSendMessage = async() => {
+    const handleSendMessage = async(e) => {
+        if (e) {
+            e.preventDefault();
+        }
         const messageInput = document.querySelector('#messageInput');
         const message = messageInput.value.trim();
 
@@ -139,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const success = await MessagesController.envoyerMessage(message);
         if (success) {
-            console.log('Message envoyé avec succès');
             messageInput.value = '';
             messageInput.focus();
         }
@@ -147,15 +149,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('click', async(e) => {
         if (e.target.id === 'sendMessageBtn' || e.target.closest('#sendMessageBtn')) {
-            await handleSendMessage();
+            e.preventDefault();
+            await handleSendMessage(e);
+            alert("test")
         }
     });
 
     document.addEventListener('keypress', async(e) => {
         if (e.target.id === 'messageInput' && e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            await handleSendMessage();
+            await handleSendMessage(e);
         }
+
     });
 });
 

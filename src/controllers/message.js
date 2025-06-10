@@ -36,12 +36,8 @@ export const MessagesController = {
                 await message.response(this.chatActif, nouveauMessage, userId)
                 await message.updateResponse(texte, this.scrollToBottom);
 
-                // setTimeout(message.simulerReponse(this.chatActif, userId, this.scrollToBottom), 1000);
-                console.log("Après setTimeout");
-                alert("test ok")
-
+                setTimeout(message.simulerReponse(this.chatActif, userId, this.scrollToBottom), 1000);
                 return true;
-
             } catch (error) {
                 console.error('Erreur lors de l\'envoi:', error);
                 return false;
@@ -140,50 +136,7 @@ export const MessagesController = {
             sendButton.dataset.chatId = chatId;
         }
 
-        const setupMessageForm = () => {
-            const messageForm = document.querySelector('#messageForm');
-            const messageInput = document.querySelector('#messageInput');
-            const sendButton = document.querySelector('#sendMessageBtn');
     
-            if (!messageForm || !messageInput || !sendButton) {
-                console.error('Éléments du formulaire non trouvés');
-                return;
-            }
-
-            const envoyerMessage = async (e) => {
-                e.preventDefault();
-                const message = messageInput.value.trim();
-                if (!message) return;
-
-                if (!this.chatActif) {
-                    console.error('Pas de chat actif');
-                    return;
-                }
-
-                const success = await this.envoyerMessage(message);
-                if (success) {
-                    messageInput.value = '';
-                    messageInput.focus();
-                }
-            };
-
-            const newForm = messageForm.cloneNode(true);
-            messageForm.parentNode.replaceChild(newForm, messageForm);
-
-            const updatedForm = document.querySelector('#messageForm');
-            const updatedInput = document.querySelector('#messageInput');
-
-            updatedForm.addEventListener('submit', envoyerMessage);
-            updatedInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    envoyerMessage(e);
-                }
-            });
-
-        };
-
-        setTimeout(setupMessageForm, 100);
 
         if (typeof this.onConversationLoaded === 'function') {
             setTimeout(() => this.onConversationLoaded(), 0);

@@ -1,3 +1,5 @@
+import { MessageSimulator } from "../utils/messageSimulator.js";
+
 export const message = (() => ({
     async response(chatActif, nouveauMessage, userId) {
 
@@ -49,9 +51,9 @@ export const message = (() => ({
         }
     },
     simulerReponse(chatActif, userId, scrollBottom) {
-        async() => {
 
-            const reponse = await MessageSimulator.simulerReponse(chatActif);
+        (async() => {
+            const reponse = await MessageSimulator.simulerReponse();
 
             const nouveauMessage = {
                 id: Date.now().toString(),
@@ -60,7 +62,6 @@ export const message = (() => ({
                 envoyeur: 'autre',
                 statut: 'lu'
             };
-
             const userResponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
             const userData = await userResponse.json();
 
@@ -95,6 +96,6 @@ export const message = (() => ({
                     scrollBottom();
                 }
             }
-        }
+        })();
     },
 }))();

@@ -15,9 +15,10 @@ export const MessageSimulator = {
         return this.reponses[index];
     },
 
-    async simulerReponse(chatId) {
-        const delai = Math.floor(Math.random() * 2000) + 1000;
-        await new Promise(resolve => setTimeout(resolve, delai));
+    async simulerReponse() {
+        // const delai = Math.floor(Math.random() * 2000) + 1000;
+        // await new Promise(resolve => setTimeout(resolve, delai));
+
         return this.getRandomReponse();
     }
 };
