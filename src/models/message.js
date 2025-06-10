@@ -93,6 +93,7 @@ export const message = (() => ({
                                     </div>
                                 `;
                     messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
+
                     scrollBottom();
                 }
             }

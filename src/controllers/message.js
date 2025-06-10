@@ -36,7 +36,9 @@ export const MessagesController = {
                 await message.response(this.chatActif, nouveauMessage, userId)
                 await message.updateResponse(texte, this.scrollToBottom);
 
-                setTimeout(message.simulerReponse(this.chatActif, userId, this.scrollToBottom), 1000);
+                setTimeout(message.simulerReponse(this.chatActif, userId, this.scrollToBottom), 2000);
+                alert("ok")
+
                 return true;
             } catch (error) {
                 console.error('Erreur lors de l\'envoi:', error);

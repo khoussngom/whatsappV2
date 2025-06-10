@@ -127,40 +127,43 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const handleSendMessage = async(e) => {
-        if (e) {
-            e.preventDefault();
-        }
-        const messageInput = document.querySelector('#messageInput');
-        const message = messageInput.value.trim();
+        try {
+            if (e) {
+                e.preventDefault();
+            }
 
-        if (!message) return;
+            const messageInput = document.querySelector('#messageInput');
+            if (!messageInput) {
+                console.error('Input message non trouvé');
+                return;
+            }
 
-        if (!MessagesController.chatActif) {
-            console.error('Aucune conversation active');
-            return;
-        }
+            const message = messageInput.value.trim();
+            if (!message) return;
 
-        const success = await MessagesController.envoyerMessage(message);
-        if (success) {
+            if (!MessagesController.chatActif) {
+                alert('Veuillez sélectionner une conversation');
+                return;
+            }
+
+            await MessagesController.envoyerMessage(message);
             messageInput.value = '';
             messageInput.focus();
+        } catch (error) {
+            console.error('Erreur lors de l\'envoi du message:', error);
         }
     };
 
     document.addEventListener('click', async(e) => {
         if (e.target.id === 'sendMessageBtn' || e.target.closest('#sendMessageBtn')) {
-            e.preventDefault();
             await handleSendMessage(e);
-            alert("test")
         }
     });
 
     document.addEventListener('keypress', async(e) => {
         if (e.target.id === 'messageInput' && e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
             await handleSendMessage(e);
         }
-
     });
 });
 
