@@ -437,4 +437,8 @@ document.addEventListener('click', async(e) => {
             menuContextuel.remove();
         }
     }
+
+    if (e.target.id === 'backButton' || e.target.closest('#backButton')) {
+        MessagesController.afficherAllMessages();
+    }
 });
