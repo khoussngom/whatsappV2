@@ -64,9 +64,9 @@ export const MessagesController = {
                 if (messagesContainer) {
                     const messageHTML = `
                     <div class="flex justify-end mb-4">
-                        <div class="max-w-[70%] bg-wa-green rounded-lg p-3">
+                        <div class="max-w-[70%] bg-blue-600  rounded-lg p-3">
                             <div class="text-wa-text break-words">${texte}</div>
-                            <div class="text-xs text-wa-text-secondary text-right mt-1">
+                            <div class="text-xs text-white text-right mt-1">
                                 ${new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
                                 <i class='bx bx-check'></i>
                             </div>
