@@ -61,8 +61,6 @@ const verifierConnexion = async function() {
     const est_connecte = sessionStorage.getItem("isLoggedIn");
     const userId = sessionStorage.getItem("userId");
 
-    console.log("Vérification connexion:", { est_connecte, userId });
-
     if (est_connecte === "true" && userId) {
         popupConnexion.classList.replace("flex", "hidden");
         try {
@@ -78,13 +76,11 @@ const verifierConnexion = async function() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("DOM chargé");
 
 
     const formConnexion = document.querySelector("#formConnexion");
     if (formConnexion) {
         formConnexion.addEventListener("submit", connexion);
-        console.log("Événement de connexion attaché au formulaire");
     } else {
         console.error("Formulaire de connexion non trouvé");
     }
@@ -330,13 +326,10 @@ document.body.addEventListener('click', async(e) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM chargé");
-
 
     const formConnexion = document.querySelector("#formConnexion");
     if (formConnexion) {
         formConnexion.addEventListener("submit", connexion);
-        console.log("Événement de connexion attaché au formulaire");
     } else {
         console.error("Formulaire de connexion non trouvé");
     }

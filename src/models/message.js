@@ -11,7 +11,7 @@ export const message = {
                     envoyeur: 'moi',
                     statut: 'envoyé'
                 };
-
+                console.log("je suis le dernier message");
                 contact.messages = contact.messages || [];
                 contact.messages.push(nouveauMessage);
                 contact.lastMessage = contenu;

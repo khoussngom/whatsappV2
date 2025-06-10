@@ -237,8 +237,6 @@ export const MessagesController = {
 
             const envoyerMessage = async (e) => {
                 e.preventDefault();
-                console.log('Tentative d\'envoi de message');
-
                 const message = messageInput.value.trim();
                 if (!message) return;
 
@@ -268,7 +266,6 @@ export const MessagesController = {
                 }
             });
 
-            console.log('Gestionnaires d\'événements configurés');
         };
 
         setTimeout(setupMessageForm, 100);

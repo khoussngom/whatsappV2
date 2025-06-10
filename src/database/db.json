@@ -1,145 +1,75 @@
 {
-  "utilisateurs": [
-    {
-      "id": "774730039",
-      "numero": "774730039",
-      "password": "marakhib",
-      "contacts": [
-        {
-          "id": "784882275",
-          "numero": "784882275",
-          "prenom": "saliou",
-          "nom": "niang",
-          "lastMessage": "anh",
-          "nbreNonLu": 0,
-          "messages": [
-            {
-              "id": 1749140818036,
-              "texte": "mouride",
-              "timestamp": "2025-06-05T16:26:58.036Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749485878131",
-              "texte": "ok",
-              "timestamp": "2025-06-09T16:17:58.131Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749485911062",
-              "texte": "fall",
-              "timestamp": "2025-06-09T16:18:31.062Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749486201988",
-              "texte": "ok",
-              "timestamp": "2025-06-09T16:23:21.988Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749486417407",
-              "texte": "ok",
-              "timestamp": "2025-06-09T16:26:57.407Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749487075942",
-              "texte": "oui",
-              "timestamp": "2025-06-09T16:37:55.942Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749487132984",
-              "texte": "non",
-              "timestamp": "2025-06-09T16:38:52.984Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749487317212",
-              "texte": "hum",
-              "timestamp": "2025-06-09T16:41:57.212Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749487968993",
-              "texte": "ok",
-              "timestamp": "2025-06-09T16:52:48.993Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749487973542",
-              "texte": "oui",
-              "timestamp": "2025-06-09T16:52:53.542Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749488222362",
-              "texte": "anh",
-              "timestamp": "2025-06-09T16:57:02.362Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            }
-          ],
-          "epingler": false,
-          "archiver": false
+    "utilisateurs": [{
+            "id": "774730039",
+            "numero": "774730039",
+            "password": "marakhib",
+            "contacts": [{
+                    "id": "784882275",
+                    "numero": "784882275",
+                    "prenom": "saliou",
+                    "nom": "niang",
+                    "lastMessage": "anh",
+                    "nbreNonLu": 0,
+                    "messages": [{
+                            "id": 1749140818036,
+                            "texte": "mouride",
+                            "timestamp": "2025-06-05T16:26:58.036Z",
+                            "envoyeur": "moi",
+                            "statut": "envoyé"
+                        }
+
+                    ],
+                    "epingler": false,
+                    "archiver": false
+                },
+                {
+                    "id": "771234567",
+                    "numero": "771234567",
+                    "prenom": "fallou",
+                    "nom": "ndiaye",
+                    "lastMessage": "test",
+                    "nbreNonLu": 0,
+                    "messages": [{
+                            "id": "1749489343931",
+                            "texte": "ziar",
+                            "timestamp": "2025-06-09T17:15:43.931Z",
+                            "envoyeur": "moi",
+                            "statut": "envoyé"
+                        }
+
+                    ],
+                    "epingler": false,
+                    "archiver": false
+                }
+            ],
+            "groupes": [{
+                "id": "breukh",
+                "nom": "breukh",
+                "membres": [{
+                    "numero": "774730039",
+                    "role": "admin"
+                }],
+                "description": "groupe Aly",
+                "lastMessage": "tabaski guinaw soubeu la",
+                "nbreNonLu": 1,
+                "messages": [{
+                    "id": 1,
+                    "texte": "wa groupe bi",
+                    "timestamp": "2024-06-05T09:30:00",
+                    "envoyeur": "774730039",
+                    "statut": "lu"
+                }],
+                "epingler": false,
+                "archiver": false
+            }]
         },
         {
-          "id": "771234567",
-          "numero": "771234567",
-          "prenom": "fallou",
-          "nom": "ndiaye",
-          "lastMessage": "",
-          "nbreNonLu": 0,
-          "messages": [],
-          "epingler": false,
-          "archiver": false
+            "id": "784882275",
+            "numero": "784882275",
+            "password": "salut",
+            "contacts": [],
+            "groupes": [],
+            "messages": []
         }
-      ],
-      "groupes": [
-        {
-          "id": "breukh",
-          "nom": "breukh",
-          "membres": [
-            {
-              "numero": "774730039",
-              "role": "admin"
-            }
-          ],
-          "description": "groupe Aly",
-          "lastMessage": "tabaski guinaw soubeu la",
-          "nbreNonLu": 1,
-          "messages": [
-            {
-              "id": 1,
-              "texte": "wa groupe bi",
-              "timestamp": "2024-06-05T09:30:00",
-              "envoyeur": "774730039",
-              "statut": "lu"
-            }
-          ],
-          "epingler": false,
-          "archiver": false
-        }
-      ]
-    },
-    {
-      "id": "784882275",
-      "numero": "784882275",
-      "password": "salut",
-      "contacts": [],
-      "groupes": [],
-      "messages": []
-    }
-  ]
+    ]
 }
