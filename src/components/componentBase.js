@@ -42,49 +42,6 @@ export const Components = {
         </div>`;
     },
 
-    ConversationActive: (chat) => {
-        return `
-        <div class="flex flex-col h-full">
-            <div class="bg-wa-container p-4 flex items-center border-b border-wa-border">
-                <div class="flex items-center">
-                    <div class="w-10 h-10 bg-wa-text-secondary rounded-full flex items-center justify-center mr-3">
-                        <i class='bx bxs-user text-xl text-wa-text'></i>
-                    </div>
-                    <div class="text-wa-text font-medium">${chat.prenom} ${chat.nom}</div>
-                </div>
-            </div>
-
-            <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 bg-wa-background">
-                ${chat.messages ? chat.messages.map(msg => `
-                    <div class="flex ${msg.envoyeur === 'moi' ? 'justify-end' : 'justify-start'} mb-4">
-                        <div class="max-w-[70%] ${msg.envoyeur === 'moi' ? 'bg-blue-600' : 'bg-wa-darker'} rounded-lg p-3">
-                            <div class="text-wa-text break-words">${msg.texte}</div>
-                            <div class="text-xs text-white text-right mt-1 flex items-center justify-end gap-1">
-                                ${new Date(msg.timestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
-                                ${msg.envoyeur === 'moi' ? `<i class='bx bx-check'></i>` : ''}
-                            </div>
-                        </div>
-                    </div>
-                `).join('') : ''}
-            </div>
-
-            <div class="p-4 border-t border-wa-border bg-wa-container">
-                <div id="messageBox" class="flex items-center gap-4">
-                    <div class="flex-1 rounded-lg bg-wa-darker">
-                        <input type="text"
-                            id="messageInput"
-                            class="w-full bg-transparent outline-none px-4 py-2 text-wa-text placeholder-wa-text-secondary"
-                            placeholder="Tapez un message"
-                            autocomplete="off">
-                    </div>
-                    <button id="sendMessageBtn"
-                        class="text-wa-green hover:text-wa-green-dark transition-colors p-2">
-                        <i class='bx bx-send text-2xl'></i>
-                    </button>
-                </div>
-            </div>
-        </div>`;
-    },
 
     AjoutContact: ({ mode = 'creation', contact = null }) => {
         return `

@@ -1,75 +1,111 @@
 {
-    "utilisateurs": [{
-            "id": "774730039",
-            "numero": "774730039",
-            "password": "marakhib",
-            "contacts": [{
-                    "id": "784882275",
-                    "numero": "784882275",
-                    "prenom": "saliou",
-                    "nom": "niang",
-                    "lastMessage": "anh",
-                    "nbreNonLu": 0,
-                    "messages": [{
-                            "id": 1749140818036,
-                            "texte": "mouride",
-                            "timestamp": "2025-06-05T16:26:58.036Z",
-                            "envoyeur": "moi",
-                            "statut": "envoyé"
-                        }
-
-                    ],
-                    "epingler": false,
-                    "archiver": false
-                },
-                {
-                    "id": "771234567",
-                    "numero": "771234567",
-                    "prenom": "fallou",
-                    "nom": "ndiaye",
-                    "lastMessage": "test",
-                    "nbreNonLu": 0,
-                    "messages": [{
-                            "id": "1749489343931",
-                            "texte": "ziar",
-                            "timestamp": "2025-06-09T17:15:43.931Z",
-                            "envoyeur": "moi",
-                            "statut": "envoyé"
-                        }
-
-                    ],
-                    "epingler": false,
-                    "archiver": false
-                }
-            ],
-            "groupes": [{
-                "id": "breukh",
-                "nom": "breukh",
-                "membres": [{
-                    "numero": "774730039",
-                    "role": "admin"
-                }],
-                "description": "groupe Aly",
-                "lastMessage": "tabaski guinaw soubeu la",
-                "nbreNonLu": 1,
-                "messages": [{
-                    "id": 1,
-                    "texte": "wa groupe bi",
-                    "timestamp": "2024-06-05T09:30:00",
-                    "envoyeur": "774730039",
-                    "statut": "lu"
-                }],
-                "epingler": false,
-                "archiver": false
-            }]
+  "utilisateurs": [
+    {
+      "id": "774730039",
+      "numero": "774730039",
+      "password": "marakhib",
+      "contacts": [
+        {
+          "id": "784882275",
+          "numero": "784882275",
+          "prenom": "saliou",
+          "nom": "niang",
+          "lastMessage": "ok",
+          "nbreNonLu": 0,
+          "messages": [
+            {
+              "id": 1749140818036,
+              "texte": "mouride",
+              "timestamp": "2025-06-05T16:26:58.036Z",
+              "envoyeur": "moi",
+              "statut": "envoyé"
+            },
+            {
+              "id": "1749553674198",
+              "texte": "okk",
+              "timestamp": "2025-06-10T11:07:54.198Z",
+              "envoyeur": "moi",
+              "statut": "envoyé"
+            },
+            {
+              "id": "1749553726941",
+              "texte": "ok",
+              "timestamp": "2025-06-10T11:08:46.941Z",
+              "envoyeur": "moi",
+              "statut": "envoyé"
+            },
+            {
+              "id": "1749553750780",
+              "texte": "ok",
+              "timestamp": "2025-06-10T11:09:10.780Z",
+              "envoyeur": "moi",
+              "statut": "envoyé"
+            }
+          ],
+          "epingler": false,
+          "archiver": false
         },
         {
-            "id": "784882275",
-            "numero": "784882275",
-            "password": "salut",
-            "contacts": [],
-            "groupes": [],
-            "messages": []
+          "id": "771234567",
+          "numero": "771234567",
+          "prenom": "fallou",
+          "nom": "ndiaye",
+          "lastMessage": "ok",
+          "nbreNonLu": 0,
+          "messages": [
+            {
+              "id": "1749489343931",
+              "texte": "ziar",
+              "timestamp": "2025-06-09T17:15:43.931Z",
+              "envoyeur": "moi",
+              "statut": "envoyé"
+            },
+            {
+              "id": "1749551935458",
+              "texte": "ok",
+              "timestamp": "2025-06-10T10:38:55.458Z",
+              "envoyeur": "moi",
+              "statut": "envoyé"
+            }
+          ],
+          "epingler": false,
+          "archiver": false
         }
-    ]
+      ],
+      "groupes": [
+        {
+          "id": "breukh",
+          "nom": "breukh",
+          "membres": [
+            {
+              "numero": "774730039",
+              "role": "admin"
+            }
+          ],
+          "description": "groupe Aly",
+          "lastMessage": "tabaski guinaw soubeu la",
+          "nbreNonLu": 1,
+          "messages": [
+            {
+              "id": 1,
+              "texte": "wa groupe bi",
+              "timestamp": "2024-06-05T09:30:00",
+              "envoyeur": "774730039",
+              "statut": "lu"
+            }
+          ],
+          "epingler": false,
+          "archiver": false
+        }
+      ]
+    },
+    {
+      "id": "784882275",
+      "numero": "784882275",
+      "password": "salut",
+      "contacts": [],
+      "groupes": [],
+      "messages": []
+    }
+  ]
 }

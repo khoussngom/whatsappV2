@@ -1,6 +1,7 @@
 import { Components } from '../components/componentBase';
 import dbData from '../database/db.json';
 import { MessageSimulator } from '../utils/messageSimulator.js';
+import { message } from '../models/message.js';
 
 const ListeMessages = document.querySelector("#ListeMessages");
 
@@ -10,13 +11,11 @@ export const MessagesController = {
 
         definirChatActif(chatId) {
             this.chatActif = chatId;
-            console.log('Chat actif défini:', chatId);
         },
 
         async envoyerMessage(texte) {
             try {
-                console.log('Début envoi message:', texte);
-
+                console.log("Début envoi message");
                 if (!this.chatActif) {
                     throw new Error('Aucune conversation active');
                 }
@@ -34,97 +33,13 @@ export const MessagesController = {
                     statut: 'envoyé'
                 };
 
-                const response = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
-                if (!response.ok) throw new Error('Erreur de récupération des données');
+                await message.response(this.chatActif, nouveauMessage, userId)
+                await message.updateResponse(texte, this.scrollToBottom);
 
-                const userData = await response.json();
-                const contactIndex = userData.contacts.findIndex(c => c.id === this.chatActif);
+                // setTimeout(message.simulerReponse(this.chatActif, userId, this.scrollToBottom), 1000);
+                console.log("Après setTimeout");
+                alert("test ok")
 
-                if (contactIndex === -1) throw new Error('Contact non trouvé');
-
-                if (!userData.contacts[contactIndex].messages) {
-                    userData.contacts[contactIndex].messages = [];
-                }
-                userData.contacts[contactIndex].messages.push(nouveauMessage);
-                userData.contacts[contactIndex].lastMessage = texte;
-
-                const updateResponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        contacts: userData.contacts
-                    })
-                });
-
-                if (!updateResponse.ok) throw new Error('Erreur de sauvegarde');
-
-                const messagesContainer = document.querySelector('#messagesContainer');
-                if (messagesContainer) {
-                    const messageHTML = `
-                    <div class="flex justify-end mb-4">
-                        <div class="max-w-[70%] bg-blue-600  rounded-lg p-3">
-                            <div class="text-wa-text break-words">${texte}</div>
-                            <div class="text-xs text-white text-right mt-1">
-                                ${new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
-                                <i class='bx bx-check'></i>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                    messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
-                    this.scrollToBottom();
-                }
-
-                setTimeout(async() => {
-                    const reponse = await MessageSimulator.simulerReponse(this.chatActif);
-
-                    const nouveauMessage = {
-                        id: Date.now().toString(),
-                        texte: reponse,
-                        timestamp: new Date().toISOString(),
-                        envoyeur: 'autre',
-                        statut: 'lu'
-                    };
-
-                    const userResponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
-                    const userData = await userResponse.json();
-
-                    const contactIndex = userData.contacts.findIndex(c => c.id === this.chatActif);
-                    if (contactIndex !== -1) {
-                        userData.contacts[contactIndex].messages.push(nouveauMessage);
-                        userData.contacts[contactIndex].lastMessage = reponse;
-
-                        await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
-                            method: 'PATCH',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                contacts: userData.contacts
-                            })
-                        });
-
-                        const messagesContainer = document.querySelector('#messagesContainer');
-                        if (messagesContainer) {
-                            const messageHTML = `
-                                <div class="flex justify-start mb-4">
-                                    <div class="max-w-[70%] bg-wa-darker rounded-lg p-3">
-                                        <div class="text-wa-text break-words">${reponse}</div>
-                                        <div class="text-xs text-wa-text-secondary text-right mt-1">
-                                            ${new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                            messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
-                            this.scrollToBottom();
-                        }
-                    }
-                }, 1000);
-
-                console.log('Message envoyé avec succès');
                 return true;
 
             } catch (error) {
@@ -148,9 +63,9 @@ export const MessagesController = {
 
                         const messagesHTML = contact.messages ? contact.messages.map(msg => `
                     <div class="flex ${msg.envoyeur === 'moi' ? 'justify-end' : 'justify-start'} mb-4">
-                        <div class="max-w-[70%] ${msg.envoyeur === 'moi' ? 'bg-wa-green' : 'bg-wa-darker'} rounded-lg p-3">
+                        <div class="max-w-[70%] ${msg.envoyeur === 'moi' ? 'bg-blue-600' : 'bg-wa-darker'} rounded-lg p-3">
                             <div class="text-wa-text break-words">${msg.texte}</div>
-                            <div class="text-xs text-wa-text-secondary text-right mt-1">
+                            <div class="text-xs text-white text-right mt-1">
                                 ${new Date(msg.timestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
                                 ${msg.envoyeur === 'moi' ? `<i class='bx bx-check'></i>` : ''}
                             </div>
@@ -163,7 +78,7 @@ export const MessagesController = {
                 })
                 .catch(error => console.error('Erreur lors du chargement des messages:', error));
     },
-  
+
 
     afficherAllMessages() {
         if (!ListeMessages) return;
@@ -229,7 +144,7 @@ export const MessagesController = {
             const messageForm = document.querySelector('#messageForm');
             const messageInput = document.querySelector('#messageInput');
             const sendButton = document.querySelector('#sendMessageBtn');
-
+    
             if (!messageForm || !messageInput || !sendButton) {
                 console.error('Éléments du formulaire non trouvés');
                 return;
