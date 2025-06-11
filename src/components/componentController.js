@@ -1,4 +1,4 @@
-export const ComponentController = (() => ({
+export const ComponentController = {
     contactMenuHTML(contact) {
         return `
             <div class="flex items-center gap-4 p-3 hover:bg-wa-hover rounded-lg cursor-pointer">
@@ -25,10 +25,9 @@ export const ComponentController = (() => ({
             </div>
         `;
         dbData.contact.forEach(contact => {
-            contactsHTML += contactMenuHTML(contact);
+            contactsHTML += this.contactMenuHTML(contact);
         });
 
         return contactsHTML;
     }
-
-}))();
+};

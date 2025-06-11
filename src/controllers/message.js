@@ -79,11 +79,12 @@ export const MessagesController = {
 
 
     afficherAllMessages() {
+        const ListeMessages = document.querySelector("#ListeMessages"); 
         if (!ListeMessages) return;
-        
         ListeMessages.innerHTML = '';
-        
+
         if (dbData.contact && dbData.contact.length > 0) {
+
             dbData.contact.forEach(contact => {
                 const messageHTML = Components.ListeMessages({
                     ...contact,
@@ -104,6 +105,7 @@ export const MessagesController = {
         }
 
         this.ajouterEcouteurs();
+
     },
 
     ajouterEcouteurs(){
@@ -137,9 +139,6 @@ export const MessagesController = {
             const sendButton = document.querySelector('#sendButton');
             sendButton.dataset.chatId = chatId;
         }
-
-    
-
         if (typeof this.onConversationLoaded === 'function') {
             setTimeout(() => this.onConversationLoaded(), 0);
         }

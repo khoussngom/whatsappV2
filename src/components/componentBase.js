@@ -4,8 +4,8 @@ export const Components = {
         <div class="flex items-center p-4 hover:bg-wa-hover cursor-pointer relative chat-item" data-chat-id="${chat.id}">
             <div class="relative mr-4">
                 <div class="w-12 h-12 bg-wa-text-secondary rounded-full flex items-center justify-center">
-                    ${chat.type === 'groupe' ? 
-                        `<i class='bx bxs-group text-2xl text-wa-text'></i>` : 
+                    ${chat.type === 'groupe' ?
+                        `<i class='bx bxs-group text-2xl text-wa-text'></i>` :
                         `<i class='bx bxs-user text-2xl text-wa-text'></i>`
                     }
                 </div>

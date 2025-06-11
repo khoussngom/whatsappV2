@@ -5,10 +5,12 @@ import { MessagesController } from './message.js';
 import dbData from '../database/db.json';
 import { ServiceValidation } from '../services/service.js';
 import { contact } from '../models/contact.js';
-
+import { Profil } from '../components/componentsProfil.js';
+import { layout } from '../components/componentsGauche.js';
 const popupConnexion = document.querySelector("#popupConnexion");
 const btnConnexion = document.querySelector("#btnConnexion");
-
+const profil = document.querySelector("#profil");
+const gauche = document.querySelector("#gauche");
 
 const afficherErreur = (message, elementId) => {
     const errorElement = document.querySelector(`#${elementId}Error`);
@@ -22,7 +24,6 @@ const cacherErreur = (elementId) => {
 };
 
 const connexion = async(e) => {
-    console.log("Fonction connexion appelée");
     e.preventDefault();
 
     const username = document.querySelector("#username").value;
@@ -353,100 +354,163 @@ document.addEventListener('click', (e) => {
     }
 });
 
+const FormContact = function(formContact) {
+    if (formContact) {
+        formContact.addEventListener('submit', async(e) => {
+            e.preventDefault();
+            const formData = new FormData(formContact);
+
+            const nouveauContact = {
+                id: formData.get('numero'),
+                numero: formData.get('numero'),
+                prenom: formData.get('prenom'),
+                nom: formData.get('nom'),
+                lastMessage: "",
+                nbreNonLu: 0,
+                messages: [],
+                epingler: false,
+                archiver: false
+            };
+
+            try {
+                const success = await contact.sauvegarderContact(nouveauContact);
+                if (success) {
+                    MessagesController.afficherAllMessages();
+                }
+            } catch (error) {
+                console.error('Erreur lors de l\'ajout:', error);
+            }
+        });
+    }
+}
+
+function handleNewContactClick() {
+    const ListeMessages = document.querySelector('#ListeMessages');
+    ListeMessages.innerHTML = Components.AjoutContact({ mode: 'creation' });
+
+    const formContact = document.querySelector('#form-contact');
+    const retourListe = document.querySelector('#retour-liste');
+
+    FormContact(formContact);
+
+    if (retourListe) {
+        retourListe.addEventListener('click', MessagesController.afficherAllMessages);
+    }
+}
+
+function getChatIdFromEvent(e) {
+    const element = e.target.closest('.modifier-contact');
+    return element ? element.dataset.chatId : null;
+}
+
+
+function getContactById(id) {
+    return dbData.contact.find(c => c.id === id);
+}
+
+function renderEditContactForm(contact) {
+    const ListeMessages = document.querySelector('#ListeMessages');
+    ListeMessages.innerHTML = Components.AjoutContact({
+        mode: 'edition',
+        contact: contact
+    });
+}
+
+function setupContactFormSubmit(chatId) {
+    const formContact = document.querySelector('#form-contact');
+    if (!formContact) return;
+
+    formContact.addEventListener('submit', async(e) => {
+        e.preventDefault();
+        const formData = new FormData(formContact);
+
+        const contactModifie = {
+            id: chatId,
+            numero: formData.get('numero'),
+            prenom: formData.get('prenom'),
+            nom: formData.get('nom')
+        };
+
+        try {
+            const success = await contact.modifierContact(chatId, contactModifie);
+            if (success) {
+                MessagesController.afficherAllMessages();
+            }
+        } catch (error) {
+            console.error('Erreur lors de la modification:', error);
+        }
+    });
+}
+
+
+async function handleModifierContactClick(e) {
+    const chatId = getChatIdFromEvent(e);
+    const contactToEdit = getContactById(chatId);
+    if (!contactToEdit) return;
+
+    renderEditContactForm(contactToEdit);
+    setupContactFormSubmit(chatId);
+    setupRetourListeClick();
+    removeMenuContextuel();
+}
+
+
+function handleBackButtonClick() {
+    MessagesController.afficherAllMessages();
+}
+
+
 document.addEventListener('click', async(e) => {
     if (e.target.id === 'newContact' || e.target.closest('#newContact')) {
-        const ListeMessages = document.querySelector('#ListeMessages');
-        ListeMessages.innerHTML = Components.AjoutContact({ mode: 'creation' });
-
-        const formContact = document.querySelector('#form-contact');
-        const retourListe = document.querySelector('#retour-liste');
-
-        if (formContact) {
-            formContact.addEventListener('submit', async(e) => {
-                e.preventDefault();
-                const formData = new FormData(formContact);
-
-                const nouveauContact = {
-                    id: formData.get('numero'),
-                    numero: formData.get('numero'),
-                    prenom: formData.get('prenom'),
-                    nom: formData.get('nom'),
-                    lastMessage: "",
-                    nbreNonLu: 0,
-                    messages: [],
-                    epingler: false,
-                    archiver: false
-                };
-
-                try {
-                    const success = await contact.sauvegarderContact(nouveauContact);
-                    if (success) {
-                        MessagesController.afficherAllMessages();
-                    }
-                } catch (error) {
-                    console.error('Erreur lors de l\'ajout:', error);
-                }
-            });
-        }
-
-        if (retourListe) {
-            retourListe.addEventListener('click', () => {
-                MessagesController.afficherAllMessages();
-            });
-        }
+        handleNewContactClick();
     }
 
     if (e.target.closest('.modifier-contact')) {
-        const chatId = e.target.closest('.modifier-contact').dataset.chatId;
-        const contactToEdit = dbData.contact.find(c => c.id === chatId);
-
-        if (contactToEdit) {
-            const ListeMessages = document.querySelector('#ListeMessages');
-            ListeMessages.innerHTML = Components.AjoutContact({
-                mode: 'edition',
-                contact: contactToEdit
-            });
-
-            const formContact = document.querySelector('#form-contact');
-            const retourListe = document.querySelector('#retour-liste');
-
-            if (formContact) {
-                formContact.addEventListener('submit', async(e) => {
-                    e.preventDefault();
-                    const formData = new FormData(formContact);
-
-                    const contactModifie = {
-                        id: chatId,
-                        numero: formData.get('numero'),
-                        prenom: formData.get('prenom'),
-                        nom: formData.get('nom')
-                    };
-
-                    try {
-                        const success = await contact.modifierContact(chatId, contactModifie);
-                        if (success) {
-                            MessagesController.afficherAllMessages();
-                        }
-                    } catch (error) {
-                        console.error('Erreur lors de la modification:', error);
-                    }
-                });
-            }
-
-            if (retourListe) {
-                retourListe.addEventListener('click', () => {
-                    MessagesController.afficherAllMessages();
-                });
-            }
-        }
-
-        const menuContextuel = document.querySelector('.menu-contextuel');
-        if (menuContextuel) {
-            menuContextuel.remove();
-        }
+        await handleModifierContactClick(e);
     }
 
     if (e.target.id === 'backButton' || e.target.closest('#backButton')) {
-        MessagesController.afficherAllMessages();
+        handleBackButtonClick();
     }
 });
+
+
+
+profil.addEventListener("click", (e) => {
+    if (e.target.id === 'profil' || e.target.closest("#profil")) {
+        gauche.innerHTML = "";
+        gauche.innerHTML = Profil.profil();
+
+        recharger()
+    }
+})
+
+function recharger() {
+    document.addEventListener('click', function handleRetour(e) {
+        const retourBtn = e.target.closest('#retour');
+        if (retourBtn) {
+            renderContactsUI();
+            document.removeEventListener('click', handleRetour);
+        }
+    });
+}
+
+function attacherEventListener() {
+    const addButton = document.querySelector('#add');
+    const ListeMessages = document.querySelector('#ListeMessages');
+    if (addButton) {
+        addButton.addEventListener('click', () => {
+            if (dbData.contact || dbData.groupe) {
+                ListeMessages.innerHTML = ComponentsAdd.nouveauMenu(dbData);
+                const liste = document.querySelector("#liste-Contacts");
+
+            }
+        });
+    }
+}
+
+function renderContactsUI() {
+    gauche.innerHTML = layout.gauche();
+    MessagesController.afficherAllMessages();
+    attacherEventListener();
+}
