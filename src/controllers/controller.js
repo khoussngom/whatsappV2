@@ -66,7 +66,8 @@ const verifierConnexion = async function() {
         popupConnexion.classList.replace("flex", "hidden");
         try {
             await contact.chargerDonnees();
-            MessagesController.afficherAllMessages();
+            MessagesController.afficherAllMessages()
+
         } catch (error) {
             console.error("Erreur lors de la vérification:", error);
 
@@ -106,7 +107,6 @@ const ListeMessages = document.querySelector("#ListeMessages");
 let currentChatId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-
     const addButton = document.querySelector('#add');
     if (addButton) {
         addButton.addEventListener('click', () => {
@@ -116,7 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
 
     document.addEventListener('click', (e) => {
         const chatItem = e.target.closest('.chat-item');
@@ -128,35 +127,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const handleSendMessage = async(e) => {
+        if (e) e.preventDefault();
+
+        const messageInput = document.querySelector('#messageInput');
+        if (!messageInput) {
+            console.error('Input message non trouvé');
+            return;
+        }
+
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        if (!MessagesController.chatActif) {
+            alert('Veuillez sélectionner une conversation');
+            return;
+        }
+
         try {
-            if (e) {
-                e.preventDefault();
-            }
-
-            const messageInput = document.querySelector('#messageInput');
-            if (!messageInput) {
-                console.error('Input message non trouvé');
-                return;
-            }
-
-            const message = messageInput.value.trim();
-            if (!message) return;
-
-            if (!MessagesController.chatActif) {
-                alert('Veuillez sélectionner une conversation');
-                return;
-            }
-
             await MessagesController.envoyerMessage(message);
             messageInput.value = '';
             messageInput.focus();
+            alert('Message envoyé');
         } catch (error) {
-            console.error('Erreur lors de l\'envoi du message:', error);
+            console.error('Erreur lors de l\'envoi du message :', error);
         }
     };
 
     document.addEventListener('click', async(e) => {
-        if (e.target.id === 'sendMessageBtn' || e.target.closest('#sendMessageBtn')) {
+        if (e.target.closest('#sendMessageBtn')) {
             await handleSendMessage(e);
         }
     });
@@ -167,6 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
 
 document.addEventListener('click', (e) => {
     const menuExistant = document.querySelector('.menu-contextuel');

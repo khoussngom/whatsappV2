@@ -15,7 +15,6 @@ export const MessagesController = {
 
         async envoyerMessage(texte) {
             try {
-                console.log("Début envoi message");
                 if (!this.chatActif) {
                     throw new Error('Aucune conversation active');
                 }
@@ -37,8 +36,6 @@ export const MessagesController = {
                 await message.updateResponse(texte, this.scrollToBottom);
 
                 setTimeout(message.simulerReponse(this.chatActif, userId, this.scrollToBottom), 2000);
-                alert("ok")
-
                 return true;
             } catch (error) {
                 console.error('Erreur lors de l\'envoi:', error);

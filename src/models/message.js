@@ -50,6 +50,7 @@ export const message = (() => ({
             scrollBottom();
         }
     },
+
     simulerReponse(chatActif, userId, scrollBottom) {
 
         (async() => {
