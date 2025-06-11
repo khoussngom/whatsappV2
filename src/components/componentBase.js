@@ -42,7 +42,7 @@ export const Components = {
         </div>`;
     },
 
-    menuContextuel(chatId){
+    menuContextuel(chatId,contact){
         return `
             <div class="menu-contextuel-option modifier-contact" data-chat-id="${chatId}">
                 <i class='bx bx-edit mr-2'></i> Modifier le contact
@@ -50,8 +50,8 @@ export const Components = {
             <div class="menu-contextuel-option supprimer-contact" data-chat-id="${chatId}">
                 <i class='bx bx-trash mr-2'></i> Supprimer le contact
             </div>
-            <div class="menu-contextuel-option bloquer-contact" data-chat-id="${chatId}">
-                <i class='bx  bx-block mr-2'></i>Bloquer le contact 
+            <div class="menu-contextuel-option ${contact.blocked ? "debloquer-contact" : "bloquer-contact"}" data-chat-id="${chatId}">
+                <i class='bx bx-${contact.blocked ? "lock-open" : "lock"} mr-2'></i>${contact.blocked ? "Débloquer le contact" : "Bloquer le contact"}
             </div>
         `;
     },
@@ -60,7 +60,7 @@ export const Components = {
         return `
         <div class="h-full flex flex-col bg-wa-container">
             <div class="bg-wa-container p-4 flex items-center border-b border-wa-border">
-                <button class="text-wa-text hover:bg-wa-hover p-2 rounded-full" id="retour-liste">
+                <button class="text-wa-text hover:bg-wa-hover p-2 rounded-full" id="backButton">
                     <i class='bx bx-arrow-back text-2xl'></i>
                 </button>
                 <h2 class="text-wa-text ml-4 text-xl">

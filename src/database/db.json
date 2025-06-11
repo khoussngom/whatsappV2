@@ -13,6 +13,7 @@
           "lastMessage": "D'accord, je comprends",
           "blocked": false,
           "archived": false,
+          "epingler": false,
           "nbreNonLu": 0,
           "messages": [
             {
@@ -22,9 +23,7 @@
               "envoyeur": "moi",
               "statut": "envoyé"
             }
-          ],
-          "epingler": false,
-          "archiver": false
+          ]
         },
         {
           "id": "771234567",
@@ -32,8 +31,9 @@
           "prenom": "fallou",
           "nom": "ndiaye",
           "lastMessage": "Merci pour votre message",
-          "blocked": false,
+          "blocked": true,
           "archived": false,
+          "epingler": false,
           "nbreNonLu": 0,
           "messages": [
             {
@@ -43,9 +43,7 @@
               "envoyeur": "moi",
               "statut": "envoyé"
             }
-          ],
-          "epingler": false,
-          "archiver": false
+          ]
         },
         {
           "id": "777765445",
@@ -55,10 +53,9 @@
           "lastMessage": "",
           "blocked": false,
           "archived": false,
-          "nbreNonLu": 0,
-          "messages": [],
           "epingler": false,
-          "archiver": false
+          "nbreNonLu": 0,
+          "messages": []
         }
       ],
       "groupes": [

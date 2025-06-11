@@ -7,6 +7,8 @@ import { ServiceValidation } from '../services/service.js';
 import { contact } from '../models/contact.js';
 import { Profil } from '../components/componentsProfil.js';
 import { layout } from '../components/componentsGauche.js';
+import { actionContact } from '../models/actionContact.js';
+
 const popupConnexion = document.querySelector("#popupConnexion");
 const btnConnexion = document.querySelector("#btnConnexion");
 const profil = document.querySelector("#profil");
@@ -156,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-document.addEventListener('click', (e) => {
+document.addEventListener('click', async(e) => {
     const menuExistant = document.querySelector('.menu-contextuel');
     if (menuExistant && !e.target.closest('.menu-contextuel')) {
         menuExistant.remove();
@@ -173,10 +175,13 @@ document.addEventListener('click', (e) => {
         if (menuExistant) {
             menuExistant.remove();
         }
-
+        const userId = sessionStorage.getItem("userId");
+        const response = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
+        const userData = await response.json();
+        const contact = userData.contacts.find(c => c.id === chatId);
         const menu = document.createElement('div');
         menu.className = 'menu-contextuel';
-        menu.innerHTML = Components.menuContextuel(chatId);
+        menu.innerHTML = Components.menuContextuel(chatId, contact);
         const rect = trigger.getBoundingClientRect();
         const parentRect = trigger.closest('.chat-item').getBoundingClientRect();
 
@@ -186,7 +191,6 @@ document.addEventListener('click', (e) => {
         trigger.closest('.chat-item').appendChild(menu);
 
         menu.querySelector('.modifier-contact').addEventListener('click', () => {
-            console.log('Modifier contact:', chatId);
             menu.remove();
         });
 
@@ -204,130 +208,124 @@ document.addEventListener('click', (e) => {
 });
 
 document.body.addEventListener('click', async(e) => {
-
-    if (e.target.closest('.modifier-contact')) {
-        const chatId = e.target.closest('.modifier-contact').dataset.chatId;
-
-
-        const contactToEdit = dbData.contact.find(c => c.id === chatId);
-
-        if (contactToEdit) {
-
-            ListeMessages.innerHTML = Components.AjoutContact({
-                mode: 'edition',
-                contact: contactToEdit
-            });
-
-            const formContact = document.querySelector('#form-contact');
-            const retourListe = document.querySelector('#retour-liste');
-
-            if (formContact) {
-                formContact.addEventListener('submit', async(e) => {
-                    e.preventDefault();
-                    const formData = new FormData(formContact);
-
-                    const contactModifie = {
-                        id: chatId,
-                        prenom: formData.get('prenom'),
-                        nom: formData.get('nom'),
-                        numero: formData.get('telephone')
-                    };
-
-                    try {
-                        const success = await contact.modifierContact(chatId, contactModifie);
-                        if (success) {
-                            MessagesController.afficherAllMessages();
-                        }
-                    } catch (error) {
-                        console.error('Erreur lors de la modification:', error);
-                    }
-                });
-            }
-
-            if (retourListe) {
-                retourListe.addEventListener('click', () => {
-                    MessagesController.afficherAllMessages();
-                });
-            }
-        }
-
-        const menuContextuel = document.querySelector('.menu-contextuel');
-        if (menuContextuel) {
-            menuContextuel.remove();
-        }
-    }
-    if (e.target.closest('.bloquer-contact')) {
-        const chatId = e.target.closest('.bloquer-contact').dataset.chatId;
-        if (await actionContact.bloquerContact(chatId)) {
-            MessagesController.afficherAllMessages();
-        }
-        const menuContextuel = document.querySelector('.menu-contextuel');
-        if (menuContextuel) menuContextuel.remove();
-    }
-
-    if (e.target.closest('.debloquer-contact')) {
-        const chatId = e.target.closest('.debloquer-contact').dataset.chatId;
-        if (await actionContact.debloquerContact(chatId)) {
-            MessagesController.afficherAllMessages();
-        }
-        const menuContextuel = document.querySelector('.menu-contextuel');
-        if (menuContextuel) menuContextuel.remove();
-    }
-
-    if (e.target.closest('.supprimer-contact')) {
-        const chatId = e.target.closest('.supprimer-contact').dataset.chatId;
-
-        document.body.insertAdjacentHTML('beforeend', Components.PopupSuppression(chatId));
-
-        const menuContextuel = document.querySelector('.menu-contextuel');
-        if (menuContextuel) {
-            menuContextuel.remove();
-        }
-    }
-
-    if (e.target.id === 'annuler-suppression') {
-        const popup = document.querySelector('#popup-overlay');
-        if (popup) {
-            popup.remove();
-        }
-    }
-
-    if (e.target.id === 'confirmer-suppression') {
-        const chatId = e.target.dataset.chatId;
-        const userId = sessionStorage.getItem('userId');
-
-        try {
-            const response = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
-            if (!response.ok) throw new Error('Erreur de récupération des données');
-
-            const userData = await response.json();
-
-            userData.contacts = userData.contacts.filter(c => c.id !== chatId);
-
-            const updateResponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    contacts: userData.contacts
-                })
-            });
-
-            if (!updateResponse.ok) throw new Error('Erreur lors de la suppression');
-
-            const popup = document.querySelector('#popup-overlay');
-            if (popup) {
-                popup.remove();
-            }
-
-            MessagesController.afficherAllMessages();
-
-        } catch (error) {
-            console.error('Erreur lors de la suppression:', error);
-        }
-    }
+    if (e.target.closest('.modifier-contact')) ModifierContact(e);
+    if (e.target.closest('.bloquer-contact')) await BloquerContact(e);
+    if (e.target.closest('.debloquer-contact')) await DebloquerContact(e);
+    if (e.target.closest('.supprimer-contact')) PopupSuppression(e);
+    if (e.target.id === 'annuler-suppression') AnnulerSuppression();
+    if (e.target.id === 'confirmer-suppression') await ConfirmerSuppression(e);
 });
+
+function ModifierContact(e) {
+    const chatId = e.target.closest('.modifier-contact').dataset.chatId;
+    const contactToEdit = dbData.contact.find(c => c.id === chatId);
+    if (!contactToEdit) return;
+
+    ListeMessages.innerHTML = Components.AjoutContact({
+        mode: 'edition',
+        contact: contactToEdit
+    });
+
+    setupFormModification(chatId);
+    setupRetourListe();
+    removeMenuContextuel();
+}
+
+function setupFormModification(chatId) {
+    const formContact = document.querySelector('#form-contact');
+    if (!formContact) return;
+
+    formContact.addEventListener('submit', async(e) => {
+        e.preventDefault();
+        const formData = new FormData(formContact);
+        const contactModifie = {
+            id: chatId,
+            prenom: formData.get('prenom'),
+            nom: formData.get('nom'),
+            numero: formData.get('telephone')
+        };
+        try {
+            const success = await contact.modifierContact(chatId, contactModifie);
+            if (success) MessagesController.afficherAllMessages();
+        } catch (error) {
+            console.error('Erreur lors de la modification:', error);
+        }
+    });
+}
+
+function setupRetourListe() {
+    const retourListe = document.querySelector('#backButton');
+    if (retourListe) {
+        retourListe.addEventListener('click', () => {
+            MessagesController.afficherAllMessages();
+        });
+    }
+}
+
+async function BloquerContact(e) {
+    const chatId = e.target.closest('.bloquer-contact').dataset.chatId;
+    if (await actionContact.bloquerContact(chatId)) {
+        MessagesController.afficherAllMessages();
+    }
+    removeMenuContextuel();
+}
+
+async function DebloquerContact(e) {
+    const chatId = e.target.closest('.debloquer-contact').dataset.chatId;
+    if (await actionContact.debloquerContact(chatId)) {
+        MessagesController.afficherAllMessages();
+    }
+    removeMenuContextuel();
+}
+
+function PopupSuppression(e) {
+    const chatId = e.target.closest('.supprimer-contact').dataset.chatId;
+    document.body.insertAdjacentHTML('beforeend', Components.PopupSuppression(chatId));
+    removeMenuContextuel();
+}
+
+function AnnulerSuppression() {
+    const popup = document.querySelector('#popup-overlay');
+    if (popup) popup.remove();
+}
+
+async function ConfirmerSuppression(e) {
+    const chatId = e.target.dataset.chatId;
+    const userId = sessionStorage.getItem('userId');
+    try {
+        const response = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
+        if (!response.ok) throw new Error('Erreur de récupération des données');
+
+        const userData = await response.json();
+        userData.contacts = userData.contacts.filter(c => c.id !== chatId);
+
+        await updateContacts(userId, userData.contacts);
+        removePopup();
+        MessagesController.afficherAllMessages();
+    } catch (error) {
+        console.error('Erreur lors de la suppression:', error);
+    }
+}
+
+async function updateContacts(userId, contacts) {
+    const updateResponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contacts })
+    });
+    if (!updateResponse.ok) throw new Error('Erreur lors de la mise à jour');
+}
+
+function removePopup() {
+    const popup = document.querySelector('#popup-overlay');
+    if (popup) popup.remove();
+}
+
+function removeMenuContextuel() {
+    const menuContextuel = document.querySelector('.menu-contextuel');
+    if (menuContextuel) menuContextuel.remove();
+}
+
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -363,10 +361,11 @@ const FormContact = function(formContact) {
                 lastMessage: "",
                 blocked: false,
                 archived: false,
+                epingler: false,
                 nbreNonLu: 0,
                 messages: [],
-                epingler: false,
-                archiver: false
+
+
             };
 
             try {
@@ -381,12 +380,12 @@ const FormContact = function(formContact) {
     }
 }
 
-function handleNewContactClick() {
+function NewContactClique() {
     const ListeMessages = document.querySelector('#ListeMessages');
     ListeMessages.innerHTML = Components.AjoutContact({ mode: 'creation' });
 
     const formContact = document.querySelector('#form-contact');
-    const retourListe = document.querySelector('#retour-liste');
+    const retourListe = document.querySelector('#backButton');
 
     FormContact(formContact);
 
@@ -440,7 +439,7 @@ function setupContactFormSubmit(chatId) {
 }
 
 
-async function handleModifierContactClick(e) {
+async function ModifierContactClick(e) {
     const chatId = getChatIdFromEvent(e);
     const contactToEdit = getContactById(chatId);
     if (!contactToEdit) return;
@@ -459,11 +458,11 @@ function handleBackButtonClick() {
 
 document.addEventListener('click', async(e) => {
     if (e.target.id === 'newContact' || e.target.closest('#newContact')) {
-        handleNewContactClick();
+        NewContactClique();
     }
 
     if (e.target.closest('.modifier-contact')) {
-        await handleModifierContactClick(e);
+        await ModifierContactClick(e);
     }
 
     if (e.target.id === 'backButton' || e.target.closest('#backButton')) {
