@@ -10,7 +10,9 @@
           "numero": "784882275",
           "prenom": "saliou",
           "nom": "niang",
-          "lastMessage": "Intéressant...",
+          "lastMessage": "D'accord, je comprends",
+          "blocked": false,
+          "archived": false,
           "nbreNonLu": 0,
           "messages": [
             {
@@ -19,104 +21,6 @@
               "timestamp": "2025-06-05T16:26:58.036Z",
               "envoyeur": "moi",
               "statut": "envoyé"
-            },
-            {
-              "id": "1749629850157",
-              "texte": "ziar",
-              "timestamp": "2025-06-11T08:17:30.157Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749629852014",
-              "texte": "Je suis d'accord",
-              "timestamp": "2025-06-11T08:17:32.014Z",
-              "envoyeur": "autre",
-              "statut": "lu"
-            },
-            {
-              "id": "1749636864537",
-              "texte": "ok",
-              "timestamp": "2025-06-11T10:14:24.537Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749636867573",
-              "texte": "Merci pour votre message",
-              "timestamp": "2025-06-11T10:14:27.573Z",
-              "envoyeur": "autre",
-              "statut": "lu"
-            },
-            {
-              "id": "1749637954024",
-              "texte": "ziar",
-              "timestamp": "2025-06-11T10:32:34.024Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749637954056",
-              "texte": "Je reviens vers vous bientôt",
-              "timestamp": "2025-06-11T10:32:34.056Z",
-              "envoyeur": "autre",
-              "statut": "lu"
-            },
-            {
-              "id": "1749638820514",
-              "texte": "anh",
-              "timestamp": "2025-06-11T10:47:00.514Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749638820545",
-              "texte": "Je suis d'accord",
-              "timestamp": "2025-06-11T10:47:00.545Z",
-              "envoyeur": "autre",
-              "statut": "lu"
-            },
-            {
-              "id": "1749639011220",
-              "texte": "yes",
-              "timestamp": "2025-06-11T10:50:11.220Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749639011254",
-              "texte": "Parfait !",
-              "timestamp": "2025-06-11T10:50:11.254Z",
-              "envoyeur": "autre",
-              "statut": "lu"
-            },
-            {
-              "id": "1749639141854",
-              "texte": "ok",
-              "timestamp": "2025-06-11T10:52:21.854Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749639141885",
-              "texte": "Je reviens vers vous bientôt",
-              "timestamp": "2025-06-11T10:52:21.885Z",
-              "envoyeur": "autre",
-              "statut": "lu"
-            },
-            {
-              "id": "1749640161199",
-              "texte": "ah",
-              "timestamp": "2025-06-11T11:09:21.199Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749640161234",
-              "texte": "Intéressant...",
-              "timestamp": "2025-06-11T11:09:21.234Z",
-              "envoyeur": "autre",
-              "statut": "lu"
             }
           ],
           "epingler": false,
@@ -127,7 +31,9 @@
           "numero": "771234567",
           "prenom": "fallou",
           "nom": "ndiaye",
-          "lastMessage": "On peut en discuter plus tard ?",
+          "lastMessage": "Merci pour votre message",
+          "blocked": false,
+          "archived": false,
           "nbreNonLu": 0,
           "messages": [
             {
@@ -136,113 +42,21 @@
               "timestamp": "2025-06-09T17:15:43.931Z",
               "envoyeur": "moi",
               "statut": "envoyé"
-            },
-            {
-              "id": "1749551935458",
-              "texte": "ok",
-              "timestamp": "2025-06-10T10:38:55.458Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749560144053",
-              "texte": "bon",
-              "timestamp": "2025-06-10T12:55:44.053Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749560151304",
-              "texte": "C'est noté",
-              "timestamp": "2025-06-10T12:55:51.304Z",
-              "envoyeur": "autre",
-              "statut": "lu"
-            },
-            {
-              "id": "1749560614139",
-              "texte": "sal",
-              "timestamp": "2025-06-10T13:03:34.139Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749560679697",
-              "texte": "salu",
-              "timestamp": "2025-06-10T13:04:39.697Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749560844983",
-              "texte": "slt",
-              "timestamp": "2025-06-10T13:07:24.983Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749560949519",
-              "texte": "SLtt",
-              "timestamp": "2025-06-10T13:09:09.519Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749637288709",
-              "texte": "g",
-              "timestamp": "2025-06-11T10:21:28.709Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749637288750",
-              "texte": "Merci pour votre message",
-              "timestamp": "2025-06-11T10:21:28.750Z",
-              "envoyeur": "autre",
-              "statut": "lu"
-            },
-            {
-              "id": "1749638348079",
-              "texte": "mouride",
-              "timestamp": "2025-06-11T10:39:08.079Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749638348108",
-              "texte": "Je reviens vers vous bientôt",
-              "timestamp": "2025-06-11T10:39:08.108Z",
-              "envoyeur": "autre",
-              "statut": "lu"
-            },
-            {
-              "id": "1749638622131",
-              "texte": "naka wathiay magal gui",
-              "timestamp": "2025-06-11T10:43:42.131Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749638622166",
-              "texte": "Parfait !",
-              "timestamp": "2025-06-11T10:43:42.166Z",
-              "envoyeur": "autre",
-              "statut": "lu"
-            },
-            {
-              "id": "1749638675151",
-              "texte": "ok",
-              "timestamp": "2025-06-11T10:44:35.151Z",
-              "envoyeur": "moi",
-              "statut": "envoyé"
-            },
-            {
-              "id": "1749638675179",
-              "texte": "On peut en discuter plus tard ?",
-              "timestamp": "2025-06-11T10:44:35.179Z",
-              "envoyeur": "autre",
-              "statut": "lu"
             }
           ],
+          "epingler": false,
+          "archiver": false
+        },
+        {
+          "id": "777765445",
+          "numero": "777765445",
+          "prenom": "khadim",
+          "nom": "ngom",
+          "lastMessage": "",
+          "blocked": false,
+          "archived": false,
+          "nbreNonLu": 0,
+          "messages": [],
           "epingler": false,
           "archiver": false
         }

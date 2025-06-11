@@ -42,6 +42,19 @@ export const Components = {
         </div>`;
     },
 
+    menuContextuel(chatId){
+        return `
+            <div class="menu-contextuel-option modifier-contact" data-chat-id="${chatId}">
+                <i class='bx bx-edit mr-2'></i> Modifier le contact
+            </div>
+            <div class="menu-contextuel-option supprimer-contact" data-chat-id="${chatId}">
+                <i class='bx bx-trash mr-2'></i> Supprimer le contact
+            </div>
+            <div class="menu-contextuel-option bloquer-contact" data-chat-id="${chatId}">
+                <i class='bx  bx-block mr-2'></i>Bloquer le contact 
+            </div>
+        `;
+    },
 
     AjoutContact: ({ mode = 'creation', contact = null }) => {
         return `

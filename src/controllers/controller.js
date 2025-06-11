@@ -11,7 +11,7 @@ const popupConnexion = document.querySelector("#popupConnexion");
 const btnConnexion = document.querySelector("#btnConnexion");
 const profil = document.querySelector("#profil");
 const gauche = document.querySelector("#gauche");
-
+const parametre = document.querySelector("#parametre")
 const afficherErreur = (message, elementId) => {
     const errorElement = document.querySelector(`#${elementId}Error`);
     errorElement.textContent = message;
@@ -90,18 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
     verifierConnexion();
 });
 
-const logoutBtn = document.querySelector("#logoutBtn");
 
-const BtnDeconnexion = () => {
-
-    sessionStorage.removeItem('isLoggedIn');
-    sessionStorage.removeItem('username');
-    popupConnexion.classList.replace("hidden", "flex");
-
-
-};
-
-logoutBtn.addEventListener('click', BtnDeconnexion);
 
 const ListeMessages = document.querySelector("#ListeMessages");
 let currentChatId = null;
@@ -181,23 +170,13 @@ document.addEventListener('click', (e) => {
 
         const chatId = trigger.dataset.chatId;
 
-
         if (menuExistant) {
             menuExistant.remove();
         }
 
-
         const menu = document.createElement('div');
         menu.className = 'menu-contextuel';
-        menu.innerHTML = `
-            <div class="menu-contextuel-option modifier-contact" data-chat-id="${chatId}">
-                <i class='bx bx-edit mr-2'></i> Modifier le contact
-            </div>
-            <div class="menu-contextuel-option supprimer-contact" data-chat-id="${chatId}">
-                <i class='bx bx-trash mr-2'></i> Supprimer le contact
-            </div>
-        `;
-
+        menu.innerHTML = Components.menuContextuel(chatId);
         const rect = trigger.getBoundingClientRect();
         const parentRect = trigger.closest('.chat-item').getBoundingClientRect();
 
@@ -276,6 +255,23 @@ document.body.addEventListener('click', async(e) => {
         if (menuContextuel) {
             menuContextuel.remove();
         }
+    }
+    if (e.target.closest('.bloquer-contact')) {
+        const chatId = e.target.closest('.bloquer-contact').dataset.chatId;
+        if (await actionContact.bloquerContact(chatId)) {
+            MessagesController.afficherAllMessages();
+        }
+        const menuContextuel = document.querySelector('.menu-contextuel');
+        if (menuContextuel) menuContextuel.remove();
+    }
+
+    if (e.target.closest('.debloquer-contact')) {
+        const chatId = e.target.closest('.debloquer-contact').dataset.chatId;
+        if (await actionContact.debloquerContact(chatId)) {
+            MessagesController.afficherAllMessages();
+        }
+        const menuContextuel = document.querySelector('.menu-contextuel');
+        if (menuContextuel) menuContextuel.remove();
     }
 
     if (e.target.closest('.supprimer-contact')) {
@@ -365,6 +361,8 @@ const FormContact = function(formContact) {
                 prenom: formData.get('prenom'),
                 nom: formData.get('nom'),
                 lastMessage: "",
+                blocked: false,
+                archived: false,
                 nbreNonLu: 0,
                 messages: [],
                 epingler: false,
@@ -513,3 +511,16 @@ function renderContactsUI() {
     MessagesController.afficherAllMessages();
     attacherEventListener();
 }
+
+
+parametre.addEventListener("click", () => {
+    gauche.innerHTML = layout.parametre();
+
+    const logoutBtn = document.querySelector("#logoutBtn");
+    const BtnDeconnexion = () => {
+        sessionStorage.removeItem('isLoggedIn');
+        sessionStorage.removeItem('username');
+        popupConnexion.classList.replace("hidden", "flex");
+    };
+    logoutBtn.addEventListener('click', BtnDeconnexion);
+})
