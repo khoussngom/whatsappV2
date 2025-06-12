@@ -2,7 +2,7 @@ export const ComponentController = {
     contactMenuHTML(contact) {
         return `
             <div class="flex items-center gap-4 p-3 hover:bg-wa-hover rounded-lg cursor-pointer">
-                <div class="w-12 h-12 bg-wa-text-secondary rounded-full">
+                <div id='icPp' class="flex justify-center items-center w-12 h-12 bg-wa-text-secondary rounded-full">
                     <i class='bx bxs-user text-2xl text-wa-text'></i>
                 </div>
                 <div>

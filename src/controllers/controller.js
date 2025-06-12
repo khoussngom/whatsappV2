@@ -9,6 +9,7 @@ import { Profil } from '../components/componentsProfil.js';
 import { layout } from '../components/componentsGauche.js';
 import { actionContact } from '../models/actionContact.js';
 import { optionContact } from '../components/optionContact.js';
+import { groupe } from '../components/componentGroupe.js';
 
 const popupConnexion = document.querySelector("#popupConnexion");
 const btnConnexion = document.querySelector("#btnConnexion");
@@ -143,7 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
             await MessagesController.envoyerMessage(message);
             messageInput.value = '';
             messageInput.focus();
-            alert('Message envoyé');
         } catch (error) {
             console.error('Erreur lors de l\'envoi du message :', error);
         }
@@ -437,6 +437,58 @@ const FormContact = function(formContact) {
     }
 }
 
+const formGroupe = function(formGroupe) {
+    if (formContact) {
+        formContact.addEventListener('submit', async(e) => {
+            e.preventDefault();
+            const formData = new FormData(formGroupe);
+
+            const nouveauGroupe = {
+                id: formData.get('numero'),
+                numero: formData.get('numero'),
+                prenom: formData.get('prenom'),
+                nom: formData.get('nom'),
+                lastMessage: "",
+                blocked: false,
+                archived: false,
+                epingler: false,
+                nbreNonLu: 0,
+                messages: [],
+
+
+            };
+
+            try {
+                const success = await contact.sauvegarderContact(nouveauContact);
+                if (success) {
+                    MessagesController.afficherAllMessages();
+                }
+            } catch (error) {
+                console.error('Erreur lors de l\'ajout:', error);
+            }
+        });
+    }
+}
+
+function NewGroupeClique() {
+    const gauche = document.querySelector('#gauche');
+    gauche.innerHTML = "";
+    gauche.innerHTML = groupe.creerGroupe();
+
+    const contact = document.querySelector("#lesContacts");
+    contact.innerHTML = ComponentController.contactsListeHTML(dbData);
+
+    setTimeout(() => {
+        const input = document.querySelector('#groupNameInput');
+        if (input) {
+            input.focus();
+        }
+    }, 0);
+
+    const formGroupe = document.querySelector('#creerGroupe');
+    recharger();
+}
+
 function NewContactClique() {
     const ListeMessages = document.querySelector('#ListeMessages');
     ListeMessages.innerHTML = Components.AjoutContact({ mode: 'creation' });
@@ -518,6 +570,10 @@ document.addEventListener('click', async(e) => {
         NewContactClique();
     }
 
+    if (e.target.id === 'creerGroupe' || e.target.closest('#creerGroupe')) {
+        NewGroupeClique();
+    }
+
     if (e.target.closest('.modifier-contact')) {
         await ModifierContactClick(e);
     }
@@ -548,6 +604,12 @@ function recharger() {
     });
 }
 
+function renderContactsUI() {
+    gauche.innerHTML = layout.gauche();
+    MessagesController.afficherAllMessages();
+    attacherEventListener();
+}
+
 function attacherEventListener() {
     const addButton = document.querySelector('#add');
     const ListeMessages = document.querySelector('#ListeMessages');
@@ -560,12 +622,6 @@ function attacherEventListener() {
             }
         });
     }
-}
-
-function renderContactsUI() {
-    gauche.innerHTML = layout.gauche();
-    MessagesController.afficherAllMessages();
-    attacherEventListener();
 }
 
 

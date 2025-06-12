@@ -10,7 +10,7 @@
           "numero": "784882275",
           "prenom": "saliou",
           "nom": "niang",
-          "lastMessage": "D'accord, je comprends",
+          "lastMessage": "On peut en discuter plus tard ?",
           "blocked": false,
           "archived": false,
           "epingler": false,
@@ -22,6 +22,20 @@
               "timestamp": "2025-06-05T16:26:58.036Z",
               "envoyeur": "moi",
               "statut": "envoyé"
+            },
+            {
+              "id": "1749723105499",
+              "texte": "ziar",
+              "timestamp": "2025-06-12T10:11:45.499Z",
+              "envoyeur": "moi",
+              "statut": "envoyé"
+            },
+            {
+              "id": "1749723105529",
+              "texte": "On peut en discuter plus tard ?",
+              "timestamp": "2025-06-12T10:11:45.529Z",
+              "envoyeur": "autre",
+              "statut": "lu"
             }
           ]
         },
