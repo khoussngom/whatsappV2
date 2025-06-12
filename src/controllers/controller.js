@@ -8,12 +8,17 @@ import { contact } from '../models/contact.js';
 import { Profil } from '../components/componentsProfil.js';
 import { layout } from '../components/componentsGauche.js';
 import { actionContact } from '../models/actionContact.js';
+import { optionContact } from '../components/optionContact.js';
 
 const popupConnexion = document.querySelector("#popupConnexion");
 const btnConnexion = document.querySelector("#btnConnexion");
 const profil = document.querySelector("#profil");
 const gauche = document.querySelector("#gauche");
 const parametre = document.querySelector("#parametre")
+const optionDuContact = document.querySelector("#optionContact")
+
+
+
 const afficherErreur = (message, elementId) => {
     const errorElement = document.querySelector(`#${elementId}Error`);
     errorElement.textContent = message;
@@ -204,6 +209,58 @@ document.addEventListener('click', async(e) => {
                 console.error('Erreur lors de la suppression:', error);
             }
         });
+    }
+});
+
+optionDuContact.addEventListener("click", async(e) => {
+    const trigger = optionDuContact;
+    if (trigger) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const rect = trigger.getBoundingClientRect();
+        const parentRect = trigger.closest('#optionContact').getBoundingClientRect();
+
+        const chatId = MessagesController.chatActif;
+        if (!chatId) {
+            console.error('Aucune conversation active');
+            return;
+        }
+
+        const userId = sessionStorage.getItem("userId");
+        const response = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
+        const userData = await response.json();
+        const contact = userData.contacts.find(c => c.id === chatId);
+
+        if (!contact) {
+            console.error('Contact non trouvé');
+            return;
+        }
+
+        const menu = document.createElement('div');
+        menu.className = 'menu-contextuel';
+        menu.innerHTML = optionContact.option(chatId, contact);
+
+        menu.style.top = `${(rect.bottom+15) - parentRect.top}px`;
+        menu.style.right = `${rect.right - parentRect.left}px`;
+        menu.style.position = "absolute";
+        menu.style.zIndex = 1000;
+
+        if (e.target.closest('.bloquer-contact')) await BloquerContact(e);
+        if (e.target.closest('.debloquer-contact')) await DebloquerContact(e);
+
+        trigger.closest('#optionContact').appendChild(menu);
+
+        const ClickOutside = (event) => {
+            if (!menu.contains(event.target) && !trigger.contains(event.target)) {
+                menu.remove();
+                document.removeEventListener('click', ClickOutside);
+            }
+        };
+
+        setTimeout(() => {
+            document.addEventListener('click', ClickOutside);
+        }, 100);
     }
 });
 

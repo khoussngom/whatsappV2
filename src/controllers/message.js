@@ -145,8 +145,8 @@ export const MessagesController = {
         const messagesContainer = document.querySelector('#messagesContainer');
         if (messagesContainer) {
             requestAnimationFrame(() => {
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
             });
+            }
         }
-    }
 };
