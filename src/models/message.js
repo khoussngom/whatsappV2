@@ -2,34 +2,61 @@ import { MessageSimulator } from "../utils/messageSimulator.js";
 
 export const message = (() => ({
     async response(chatActif, nouveauMessage, userId) {
-
         const reponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
         if (!reponse.ok) throw new Error('Erreur de récupération des données');
 
         const userData = await reponse.json();
-        const contactIndex = userData.contacts.findIndex(c => c.id === chatActif);
+        let contactIndex = null;
 
-        if (contactIndex === -1) throw new Error('Contact non trouvé');
+        contactIndex = userData.groupes.findIndex(c => c.id === chatActif)
+        if (contactIndex !== -1) {
+            contactIndex = userData.groupes.findIndex(c => c.id === chatActif);
+            if (contactIndex === -1) throw new Error('Groupe non trouvé');
 
-        if (!userData.contacts[contactIndex].messages) {
-            userData.contacts[contactIndex].messages = [];
+            if (!userData.groupes[contactIndex].messages) {
+                userData.groupes[contactIndex].messages = [];
+            }
+
+            userData.groupes[contactIndex].messages.push(nouveauMessage);
+            userData.groupes[contactIndex].lastMessage = nouveauMessage.texte;
+
+            const updateReponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    groupes: userData.groupes
+                })
+            });
+
+            if (!updateReponse.ok) throw new Error('Erreur lors de la sauvegarde du message');
+
+        } else {
+            contactIndex = userData.contacts.findIndex(c => c.id === chatActif);
+            if (contactIndex === -1) throw new Error('Contact non trouvé');
+
+            if (!userData.contacts[contactIndex].messages) {
+                userData.contacts[contactIndex].messages = [];
+            }
+
+            userData.contacts[contactIndex].messages.push(nouveauMessage);
+            userData.contacts[contactIndex].lastMessage = nouveauMessage.texte;
+
+            const updateReponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contacts: userData.contacts
+                })
+            });
+
+            if (!updateReponse.ok) throw new Error('Erreur lors de la sauvegarde du message');
         }
-
-        userData.contacts[contactIndex].messages.push(nouveauMessage);
-        userData.contacts[contactIndex].lastMessage = nouveauMessage.texte;
-
-        const updateReponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                contacts: userData.contacts
-            })
-        });
-
-        if (!updateReponse.ok) throw new Error('Erreur lors de la sauvegarde du message');
     },
+
 
     async updateResponse(texte, scrollBottom) {
 

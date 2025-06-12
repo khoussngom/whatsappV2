@@ -8,10 +8,10 @@ const ListeMessages = document.querySelector("#ListeMessages");
 export const MessagesController = {
         chatActif: null,
         onConversationLoaded: null,
-
         definirChatActif(chatId) {
             this.chatActif = chatId;
         },
+
 
         async envoyerMessage(texte) {
             try {
@@ -53,26 +53,34 @@ export const MessagesController = {
             fetch(`http://localhost:3000/utilisateurs/${userId}`)
                 .then(response => response.json())
                 .then(userData => {
-                        const contact = userData.contacts.find(c => c.id === chatId);
-                        if (!contact) return;
+                        let source = null;
 
-                        const messagesHTML = contact.messages ? contact.messages.map(msg => `
-                    <div class="flex ${msg.envoyeur === 'moi' ? 'justify-end' : 'justify-start'} mb-4">
-                        <div class="max-w-[70%] ${msg.envoyeur === 'moi' ? 'bg-blue-600' : 'bg-wa-darker'} rounded-lg p-3">
-                            <div class="text-wa-text break-words">${msg.texte}</div>
-                            <div class="text-xs text-white text-right mt-1">
-                                ${new Date(msg.timestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
-                                ${msg.envoyeur === 'moi' ? `<i class='bx bx-check'></i>` : ''}
-                            </div>
+                        source = userData.groupes.find(g => g.id === chatId);
+
+                        if (!source) {
+                            source = userData.contacts.find(c => c.id === chatId);
+                        }
+
+                        if (!source) return;
+
+                        const messagesHTML = source.messages ? source.messages.map(msg => `
+                <div class="flex ${msg.envoyeur === 'moi' ? 'justify-end' : 'justify-start'} mb-4">
+                    <div class="max-w-[70%] ${msg.envoyeur === 'moi' ? 'bg-blue-600' : 'bg-wa-darker'} rounded-lg p-3">
+                        <div class="text-wa-text break-words">${msg.texte}</div>
+                        <div class="text-xs text-white text-right mt-1">
+                            ${new Date(msg.timestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
+                            ${msg.envoyeur === 'moi' ? `<i class='bx bx-check'></i>` : ''}
                         </div>
                     </div>
-                `).join('') : '';
+                </div>
+            `).join('') : '';
 
-                    messagesContainer.innerHTML = messagesHTML;
-                    this.scrollToBottom();
-                })
-                .catch(error => console.error('Erreur lors du chargement des messages:', error));
-    },
+            messagesContainer.innerHTML = messagesHTML;
+            this.scrollToBottom();
+        })
+        .catch(error => console.error('Erreur lors du chargement des messages:', error));
+},
+
 
 
     afficherAllMessages() {
@@ -110,6 +118,7 @@ export const MessagesController = {
         chatItems.forEach(item => {
             item.addEventListener('click', () => {
                 const chatId = item.dataset.chatId;
+            
                 this.afficherConversation(chatId);
             });
         });
@@ -134,6 +143,7 @@ export const MessagesController = {
             messageInput.focus();
 
             const sendButton = document.querySelector('#sendButton');
+            
             sendButton.dataset.chatId = chatId;
         }
         if (typeof this.onConversationLoaded === 'function') {

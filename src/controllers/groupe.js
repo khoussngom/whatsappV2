@@ -1,6 +1,8 @@
 import { groupe } from "../components/componentGroupe";
 import { ComponentController } from '../components/componentController';
 import dbData from '../database/db.json';
+import { popupMessage } from "../components/popupMessage.js";
+
 
 let contactsSelectionnes = [];
 
@@ -75,32 +77,53 @@ export function NewGroupeClique(recharger = () => {}) {
     recharger();
 }
 
-function form() {
+async function form() {
 
     const btnCreerGroupe = document.querySelector('#createGroupBtn');
 
     btnCreerGroupe.addEventListener('click', async(e) => {
         e.preventDefault();
 
-        if (contactsSelectionnes.length === 0) {
-            alert("no")
+        if (contactsSelectionnes.length < 1) {
+            const erreur = "Erreur de la creation du groupe !";
+            const mess = "le groupe doit avoir au moins une personne ajoutée.";
+            popupMessage.message(erreur, mess);
             return;
         }
 
         const nomGroupe = document.querySelector('#groupNameInput').value;
         if (!nomGroupe.trim()) {
+            const erreur = "Erreur de la creation du groupe !";
+            const mess = "le nom du groupe est obligatoire.";
+            popupMessage.message(erreur, mess);
             return;
         }
-
+        const userId = sessionStorage.getItem("userId");
         const nouveauGroupe = {
             id: Date.now().toString(),
             nom: nomGroupe,
             type: 'groupe',
+            admin: [userId],
             membres: Array.from(contactsSelectionnes),
             messages: [],
             lastMessage: '',
-            nbreNonLu: 0
+            nbreNonLu: 0,
+            epingler: false,
+            archiver: false
         };
+
+        const reponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
+        const utilisateur = await reponse.json()
+        console.log(utilisateur.groupes)
+        utilisateur.groupes.push(nouveauGroupe);
+
+        const updateResponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ groupes: utilisateur.groupes })
+        })
+
+        dbData.Groupe = utilisateur.groupes;
     });
 
 }

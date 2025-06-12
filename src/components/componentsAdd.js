@@ -10,8 +10,8 @@ export const ComponentsAdd = {
                         <h2 class="text-xl text-wa-text">Nouvelle discussion</h2>
                     </div>
                     
-                    <div id="creerGroupe" class="flex flex-col space-y-2">
-                        <button class="flex items-center gap-4 p-3 hover:bg-wa-hover rounded-lg w-full transition-colors" id="newGroup">
+                    <div class="flex flex-col space-y-2">
+                        <button id="creationGroupe" class="flex items-center gap-4 p-3 hover:bg-wa-hover rounded-lg w-full transition-colors" id="newGroup">
                             <div class="w-12 h-12 bg-wa-green rounded-full flex items-center justify-center">
                                 <i class='bx bxs-group text-2xl text-wa-text'></i>
                             </div>

@@ -214,7 +214,6 @@ document.addEventListener('click', async(e) => {
 });
 
 
-
 optionDuContact.addEventListener("click", async(e) => {
     const trigger = optionDuContact;
     if (trigger) {
@@ -233,18 +232,24 @@ optionDuContact.addEventListener("click", async(e) => {
         const userId = sessionStorage.getItem("userId");
         const response = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
         const userData = await response.json();
-        const contact = userData.contacts.find(c => c.id === chatId);
 
-        if (!contact) {
-            console.error('Contact non trouvé');
-            return;
+        let type = "contact";
+        let cible = userData.contacts.find(c => c.id === chatId);
+
+        if (!cible) {
+            cible = userData.groupes.find(g => g.id === chatId);
+            if (!cible) {
+                console.error('Contact ou groupe non trouvé');
+                return;
+            }
+            type = "groupe";
         }
 
         const menu = document.createElement('div');
         menu.className = 'menu-contextuel';
-        menu.innerHTML = optionContact.option(chatId, contact);
+        menu.innerHTML = optionContact.option(chatId, cible, type);
 
-        menu.style.top = `${(rect.bottom+15) - parentRect.top}px`;
+        menu.style.top = `${(rect.bottom + 15) - parentRect.top}px`;
         menu.style.right = `${rect.right - parentRect.left}px`;
         menu.style.position = "absolute";
         menu.style.zIndex = 1000;
@@ -266,6 +271,7 @@ optionDuContact.addEventListener("click", async(e) => {
         }, 100);
     }
 });
+
 
 document.body.addEventListener('click', async(e) => {
     if (e.target.closest('.modifier-contact')) ModifierContact(e);
@@ -555,8 +561,7 @@ document.addEventListener('click', async(e) => {
         NewContactClique();
     }
 
-    if (e.target.id === 'creerGroupe' || e.target.closest('#creerGroupe')) {
-
+    if (e.target.id === 'creationGroupe' || e.target.closest('#creationGroupe')) {
         NewGroupeClique(recharger);
     }
 
