@@ -29,7 +29,7 @@ export const groupe = (() => ({
                     </div>
 
                     <div class="p-4 bg-black border-t border-gray-700">
-                        <button id="createGroupBtn" class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200" > Créer le groupe </button>
+                        <button id="createGroupBtn" type="button" class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200" > Créer le groupe </button>
                     </div>
                 </div>`
     },
