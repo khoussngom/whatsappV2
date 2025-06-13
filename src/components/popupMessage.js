@@ -6,7 +6,7 @@ export const popupMessage = (() => ({
                 <h3 class="text-red-600 text-lg font-medium mb-4">${erreur}</h3>
                 <p class="text-black text-2xl mb-6">${message}</p>
                 <div class="flex justify-end gap-4">
-                    <button class="px-4 py-2 text-wa-text bg-gray-400 hover:bg-wa-hover rounded" id="annuler-suppression">
+                    <button class="px-4 py-2 text-white bg-gray-400 hover:bg-green-600 rounded" id="annuler-suppression">
                         D'accord
                     </button>
                 </div>
