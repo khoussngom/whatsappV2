@@ -12,6 +12,7 @@ import { optionContact } from '../components/optionContact.js';
 import { groupe } from '../components/componentGroupe.js';
 import { NewGroupeClique } from './groupe.js';
 import { Recherche } from './recherche.js';
+import { use } from 'react';
 
 
 const popupConnexion = document.querySelector("#popupConnexion");
@@ -51,11 +52,12 @@ const connexion = async(e) => {
 
         const utilisateurs = await response.json();
         let utilisateur = utilisateurs[0];
+        const userId = sessionStorage.getItem("userId");
 
         if (!utilisateur) {
 
             const nouvelUtilisateur = {
-                id: Date.now().toString(),
+                id: userId,
                 numero: username,
                 password: password,
                 nom: "",
