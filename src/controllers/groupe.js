@@ -5,7 +5,9 @@ import { popupMessage } from "../components/popupMessage.js";
 
 
 let contactsSelectionnes = [];
-const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs"
+// const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs"
+const url = "http://localhost:3000/utilisateurs";
+
 
 function ajouterDansGroupe(e) {
     e.preventDefault();

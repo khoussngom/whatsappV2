@@ -20,7 +20,10 @@ const profil = document.querySelector("#profil");
 const gauche = document.querySelector("#gauche");
 const parametre = document.querySelector("#parametre")
 const optionDuContact = document.querySelector("#optionContact")
-const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs";
+
+// const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs";
+const url = "http://localhost:3000/utilisateurs";
+
 const search = document.querySelector("#recherche");
 
 
@@ -38,7 +41,7 @@ const cacherErreur = (elementId) => {
 const connexion = async(e) => {
     e.preventDefault();
 
-    const username = document.querySelector("#username").value;
+    const username = document.querySelector("#username").value.trim();
     const password = document.querySelector("#password").value;
 
     try {
@@ -46,13 +49,39 @@ const connexion = async(e) => {
         cacherErreur('username');
 
         const response = await fetch(`${url}?numero=${username}`);
-        if (!response.ok) throw new Error("Erreur de connexion au serveur");
+        if (!response.ok) throw new Error("Erreur lors de la vérification");
 
         const utilisateurs = await response.json();
-        const utilisateur = utilisateurs.find(u => u.numero === username && u.password === password);
+        let utilisateur = utilisateurs[0];
 
         if (!utilisateur) {
-            throw new Error("Numéro ou mot de passe incorrect");
+            const nouvelUtilisateur = {
+                id: Date.now().toString(),
+                numero: username,
+                password: password,
+                nom: "",
+                prenom: "",
+                contacts: [],
+                groupes: [],
+                status: "Hey! J'utilise WhatsApp"
+            };
+
+            const createResponse = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(nouvelUtilisateur)
+            });
+
+            if (!createResponse.ok) {
+                throw new Error("Erreur lors de la création du compte");
+            }
+
+            utilisateur = nouvelUtilisateur;
+        } else {
+
+            if (utilisateur.password !== password) {
+                throw new Error("Mot de passe incorrect");
+            }
         }
 
         sessionStorage.setItem("isLoggedIn", "true");
@@ -60,7 +89,6 @@ const connexion = async(e) => {
         sessionStorage.setItem("userId", utilisateur.id);
 
         popupConnexion.classList.replace("flex", "hidden");
-
         await contact.chargerDonnees();
         MessagesController.afficherAllMessages();
 
@@ -69,6 +97,7 @@ const connexion = async(e) => {
         afficherErreur(error.message, 'username');
     }
 }
+
 
 const verifierConnexion = async function() {
     const est_connecte = sessionStorage.getItem("isLoggedIn");
