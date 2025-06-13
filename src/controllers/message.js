@@ -35,6 +35,8 @@ export const MessagesController = {
                     throw new Error('Utilisateur non connecté');
                 }
 
+                alert(userId);
+
                 const nouveauMessage = {
                     id: Date.now().toString(),
                     texte: texte,
@@ -44,8 +46,11 @@ export const MessagesController = {
                 };
 
                 await message.response(this.chatActif, nouveauMessage, userId);
-                await message.updateResponse(texte, this.scrollToBottom);
 
+                const destinataireId = this.chatActif;
+                await message.envoyerAuDestinataire(destinataireId, nouveauMessage);
+
+                await message.updateResponse(texte, this.scrollToBottom);
                 return true;
             } catch (error) {
                 console.error('Erreur lors de l\'envoi:', error);
@@ -108,20 +113,23 @@ export const MessagesController = {
             const messagesContainer = document.querySelector('#messagesContainer');
             if (!messagesContainer) return;
 
-            const messagesHTML = source.messages.map(msg => `
-                <div class="flex ${msg.envoyeur === 'moi' ? 'justify-end' : 'justify-start'} mb-4">
-                    <div class="max-w-[70%] ${msg.envoyeur === 'moi' ? 'bg-blue-600' : 'bg-gray-600'} rounded-lg p-3">
+            const currentMessages = messagesContainer.innerHTML;
+            const newMessagesHTML = source.messages.map(msg => `
+                <div class="flex ${msg.envoyeur === userId ? 'justify-end' : 'justify-start'} mb-4">
+                    <div class="max-w-[70%] ${msg.envoyeur === userId ? 'bg-blue-600' : 'bg-gray-600'} rounded-lg p-3">
                         <div class="text-white break-words">${msg.texte}</div>
                         <div class="text-xs text-white text-right mt-1">
                             ${new Date(msg.timestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
-                            ${msg.envoyeur === 'moi' ? `<i class='bx bx-check'></i>` : ''}
+                            ${msg.envoyeur === userId ? `<i class='bx bx-check'></i>` : ''}
                         </div>
                     </div>
                 </div>
             `).join('');
 
-            messagesContainer.innerHTML = messagesHTML;
-            this.scrollToBottom();
+            if (currentMessages !== newMessagesHTML) {
+                messagesContainer.innerHTML = newMessagesHTML;
+                this.scrollToBottom();
+            }
         })
         .catch(error => console.error('Erreur lors de la vérification des nouveaux messages:', error));
 },
