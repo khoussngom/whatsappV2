@@ -93,7 +93,9 @@ export const MessagesController = {
             }
         })
         .catch(error => console.error('Erreur lors du chargement des messages:', error));
-},
+    },
+
+
     verifierNouveauxMessages(chatId, userId) {
     fetch(`${url}/${userId}`)
         .then(response => response.json())
