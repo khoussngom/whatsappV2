@@ -134,19 +134,18 @@ export const message = (() => ({
 
     async envoyerAuDestinataire(destinataireId, message) {
         try {
-            // Récupérer les données du destinataire
             const response = await fetch(`${url}/${destinataireId}`);
             if (!response.ok) throw new Error('Destinataire non trouvé');
 
             const destinataire = await response.json();
             const expediteurId = sessionStorage.getItem('userId');
 
-            // Ajouter le message dans la conversation du destinataire
+
             if (!destinataire.messages) {
                 destinataire.messages = [];
             }
 
-            // Trouver la conversation avec l'expéditeur
+
             let conversation = destinataire.contacts.find(c => c.id === expediteurId);
             if (!conversation) {
                 throw new Error('Conversation non trouvée');
@@ -156,16 +155,16 @@ export const message = (() => ({
                 conversation.messages = [];
             }
 
-            // Ajouter le message
+
             conversation.messages.push({
                 ...message,
                 envoyeur: expediteurId
             });
 
-            // Mettre à jour le dernier message
+
             conversation.lastMessage = message.texte;
 
-            // Sauvegarder les modifications
+
             await fetch(`${url}/${destinataireId}`, {
                 method: 'PATCH',
                 headers: {
