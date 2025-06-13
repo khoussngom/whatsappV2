@@ -1,4 +1,4 @@
-const url = "http://localhost:3000/utilisateurs"
+const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs"
 
 export const actionContact = (() => ({
     async bloquerContact(contactId) {

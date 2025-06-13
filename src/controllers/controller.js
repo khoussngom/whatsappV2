@@ -18,7 +18,7 @@ const profil = document.querySelector("#profil");
 const gauche = document.querySelector("#gauche");
 const parametre = document.querySelector("#parametre")
 const optionDuContact = document.querySelector("#optionContact")
-const url = "http://localhost:3000/utilisateurs";
+const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs";
 
 
 const afficherErreur = (message, elementId) => {

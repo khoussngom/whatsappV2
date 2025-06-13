@@ -4,7 +4,7 @@ import { MessageSimulator } from '../utils/messageSimulator.js';
 import { message } from '../models/message.js';
 
 const ListeMessages = document.querySelector("#ListeMessages");
-const url = "http://localhost:3000/utilisateurs"
+const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs"
 export const MessagesController = {
         chatActif: null,
         onConversationLoaded: null,
