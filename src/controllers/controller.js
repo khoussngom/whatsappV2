@@ -60,10 +60,6 @@ const connexion = async(e) => {
         const userId = sessionStorage.getItem("userId");
 
         if (!utilisateur) {
-
-            sessionStorage.setItem("isLoggedIn", "true");
-            sessionStorage.setItem("username", username);
-            sessionStorage.setItem("userId", utilisateur.id);
             const nouvelUtilisateur = {
                 id: userId,
                 numero: username,
