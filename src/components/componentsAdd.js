@@ -1,8 +1,8 @@
 export const ComponentsAdd = {
         nouveauMenu(dbData) {
             return `
-            <div class="flex flex-col">
-                <div class="p-4">
+            <div id="liste-Contacts" class="flex flex-col">
+                <div class="p-4 ">
                     <div class="flex items-center gap-3 mb-6">
                         <button class="text-wa-text-secondary hover:text-wa-text" id="backButton">
                             <i class='bx bx-arrow-back text-xl'></i>
@@ -11,7 +11,7 @@ export const ComponentsAdd = {
                     </div>
                     
                     <div class="flex flex-col space-y-2">
-                        <button class="flex items-center gap-4 p-3 hover:bg-wa-hover rounded-lg w-full transition-colors" id="newGroup">
+                        <button id="creationGroupe" class="flex items-center gap-4 p-3 hover:bg-wa-hover rounded-lg w-full transition-colors" id="newGroup">
                             <div class="w-12 h-12 bg-wa-green rounded-full flex items-center justify-center">
                                 <i class='bx bxs-group text-2xl text-wa-text'></i>
                             </div>
@@ -65,43 +65,4 @@ export const ComponentsAdd = {
         `;
     },
 
-    popupNouveauContact() {
-        return `
-            <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-popup">
-                <div class="bg-wa-darker p-6 rounded-lg w-96">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl text-wa-text">Nouveau contact</h2>
-                        <button id="closePopup" class="text-wa-text-secondary hover:text-wa-text">
-                            <i class='bx bx-x text-2xl'></i>
-                        </button>
-                    </div>
-                    <form id="contactForm" class="space-y-4">
-                        <div>
-                            <input type="text" name="prenom" placeholder="Prénom" required
-                                class="w-full p-2 rounded bg-wa-panel text-wa-text placeholder-wa-text-secondary border border-wa-border focus:outline-none focus:border-wa-green">
-                        </div>
-                        <div>
-                            <input type="text" name="nom" placeholder="Nom" required
-                                class="w-full p-2 rounded bg-wa-panel text-wa-text placeholder-wa-text-secondary border border-wa-border focus:outline-none focus:border-wa-green">
-                        </div>
-                        <div>
-                            <input type="tel" name="numero" placeholder="Numéro de téléphone" required
-                                class="w-full p-2 rounded bg-wa-panel text-wa-text placeholder-wa-text-secondary border border-wa-border focus:outline-none focus:border-wa-green">
-                        </div>
-                        <small id="formMessage" class="text-sm mt-2 hidden"></small>
-                        <div class="flex justify-end space-x-2 pt-4">
-                            <button type="button" id="cancelButton"
-                                class="px-4 py-2 text-wa-text-secondary hover:text-wa-text">
-                                Annuler
-                            </button>
-                            <button type="submit"
-                                class="px-4 py-2 bg-wa-green text-white rounded hover:bg-opacity-80">
-                                Ajouter
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        `;
-    }
 };

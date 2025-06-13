@@ -5,9 +5,20 @@ import { MessagesController } from './message.js';
 import dbData from '../database/db.json';
 import { ServiceValidation } from '../services/service.js';
 import { contact } from '../models/contact.js';
+import { Profil } from '../components/componentsProfil.js';
+import { layout } from '../components/componentsGauche.js';
+import { actionContact } from '../models/actionContact.js';
+import { optionContact } from '../components/optionContact.js';
+import { groupe } from '../components/componentGroupe.js';
+import { NewGroupeClique } from './groupe.js';
 
 const popupConnexion = document.querySelector("#popupConnexion");
 const btnConnexion = document.querySelector("#btnConnexion");
+const profil = document.querySelector("#profil");
+const gauche = document.querySelector("#gauche");
+const parametre = document.querySelector("#parametre")
+const optionDuContact = document.querySelector("#optionContact")
+const url = "http://localhost:3000/utilisateurs";
 
 
 const afficherErreur = (message, elementId) => {
@@ -22,7 +33,6 @@ const cacherErreur = (elementId) => {
 };
 
 const connexion = async(e) => {
-    console.log("Fonction connexion appelée");
     e.preventDefault();
 
     const username = document.querySelector("#username").value;
@@ -32,7 +42,7 @@ const connexion = async(e) => {
         await ServiceValidation.validerNumero(username);
         cacherErreur('username');
 
-        const response = await fetch(`http://localhost:3000/utilisateurs?numero=${username}`);
+        const response = await fetch(`${url}?numero=${username}`);
         if (!response.ok) throw new Error("Erreur de connexion au serveur");
 
         const utilisateurs = await response.json();
@@ -65,7 +75,8 @@ const verifierConnexion = async function() {
         popupConnexion.classList.replace("flex", "hidden");
         try {
             await contact.chargerDonnees();
-            MessagesController.afficherAllMessages();
+            MessagesController.afficherAllMessages()
+
         } catch (error) {
             console.error("Erreur lors de la vérification:", error);
 
@@ -88,24 +99,12 @@ document.addEventListener("DOMContentLoaded", () => {
     verifierConnexion();
 });
 
-const logoutBtn = document.querySelector("#logoutBtn");
 
-const BtnDeconnexion = () => {
-
-    sessionStorage.removeItem('isLoggedIn');
-    sessionStorage.removeItem('username');
-    popupConnexion.classList.replace("hidden", "flex");
-
-
-};
-
-logoutBtn.addEventListener('click', BtnDeconnexion);
 
 const ListeMessages = document.querySelector("#ListeMessages");
 let currentChatId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-
     const addButton = document.querySelector('#add');
     if (addButton) {
         addButton.addEventListener('click', () => {
@@ -116,7 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
     document.addEventListener('click', (e) => {
         const chatItem = e.target.closest('.chat-item');
         if (chatItem) {
@@ -126,40 +124,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const handleSendMessage = async() => {
+    const handleSendMessage = async(e) => {
+        if (e) e.preventDefault();
+
         const messageInput = document.querySelector('#messageInput');
-        const message = messageInput.value.trim();
-
-        if (!message) return;
-
-        if (!MessagesController.chatActif) {
-            console.error('Aucune conversation active');
+        if (!messageInput) {
+            console.error('Input message non trouvé');
             return;
         }
 
-        const success = await MessagesController.envoyerMessage(message);
-        if (success) {
-            console.log('Message envoyé avec succès');
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        if (!MessagesController.chatActif) {
+            alert('Veuillez sélectionner une conversation');
+            return;
+        }
+
+        try {
+            await MessagesController.envoyerMessage(message);
             messageInput.value = '';
             messageInput.focus();
+        } catch (error) {
+            console.error('Erreur lors de l\'envoi du message :', error);
         }
     };
 
     document.addEventListener('click', async(e) => {
-        if (e.target.id === 'sendMessageBtn' || e.target.closest('#sendMessageBtn')) {
-            await handleSendMessage();
+        if (e.target.closest('#sendMessageBtn')) {
+            await handleSendMessage(e);
         }
     });
 
     document.addEventListener('keypress', async(e) => {
         if (e.target.id === 'messageInput' && e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            await handleSendMessage();
+            await handleSendMessage(e);
         }
     });
 });
 
-document.addEventListener('click', (e) => {
+
+document.addEventListener('click', async(e) => {
     const menuExistant = document.querySelector('.menu-contextuel');
     if (menuExistant && !e.target.closest('.menu-contextuel')) {
         menuExistant.remove();
@@ -173,23 +178,16 @@ document.addEventListener('click', (e) => {
 
         const chatId = trigger.dataset.chatId;
 
-
         if (menuExistant) {
             menuExistant.remove();
         }
-
-
+        const userId = sessionStorage.getItem("userId");
+        const response = await fetch(`${url}/${userId}`);
+        const userData = await response.json();
+        const contact = userData.contacts.find(c => c.id === chatId);
         const menu = document.createElement('div');
         menu.className = 'menu-contextuel';
-        menu.innerHTML = `
-            <div class="menu-contextuel-option modifier-contact" data-chat-id="${chatId}">
-                <i class='bx bx-edit mr-2'></i> Modifier le contact
-            </div>
-            <div class="menu-contextuel-option supprimer-contact" data-chat-id="${chatId}">
-                <i class='bx bx-trash mr-2'></i> Supprimer le contact
-            </div>
-        `;
-
+        menu.innerHTML = Components.menuContextuel(chatId, contact);
         const rect = trigger.getBoundingClientRect();
         const parentRect = trigger.closest('.chat-item').getBoundingClientRect();
 
@@ -199,7 +197,6 @@ document.addEventListener('click', (e) => {
         trigger.closest('.chat-item').appendChild(menu);
 
         menu.querySelector('.modifier-contact').addEventListener('click', () => {
-            console.log('Modifier contact:', chatId);
             menu.remove();
         });
 
@@ -216,114 +213,185 @@ document.addEventListener('click', (e) => {
     }
 });
 
-document.body.addEventListener('click', async(e) => {
 
-    if (e.target.closest('.modifier-contact')) {
-        const chatId = e.target.closest('.modifier-contact').dataset.chatId;
+optionDuContact.addEventListener("click", async(e) => {
+    const trigger = optionDuContact;
+    if (trigger) {
+        e.preventDefault();
+        e.stopPropagation();
 
+        const rect = trigger.getBoundingClientRect();
+        const parentRect = trigger.closest('#optionContact').getBoundingClientRect();
 
-        const contactToEdit = dbData.contact.find(c => c.id === chatId);
+        const chatId = MessagesController.chatActif;
+        if (!chatId) {
+            console.error('Aucune conversation active');
+            return;
+        }
 
-        if (contactToEdit) {
+        const userId = sessionStorage.getItem("userId");
+        const response = await fetch(`${url}/${userId}`);
+        const userData = await response.json();
 
-            ListeMessages.innerHTML = Components.AjoutContact({
-                mode: 'edition',
-                contact: contactToEdit
-            });
+        let type = "contact";
+        let cible = userData.contacts.find(c => c.id === chatId);
 
-            const formContact = document.querySelector('#form-contact');
-            const retourListe = document.querySelector('#retour-liste');
-
-            if (formContact) {
-                formContact.addEventListener('submit', async(e) => {
-                    e.preventDefault();
-                    const formData = new FormData(formContact);
-
-                    const contactModifie = {
-                        id: chatId,
-                        prenom: formData.get('prenom'),
-                        nom: formData.get('nom'),
-                        numero: formData.get('telephone')
-                    };
-
-                    try {
-                        const success = await contact.modifierContact(chatId, contactModifie);
-                        if (success) {
-                            MessagesController.afficherAllMessages();
-                        }
-                    } catch (error) {
-                        console.error('Erreur lors de la modification:', error);
-                    }
-                });
+        if (!cible) {
+            cible = userData.groupes.find(g => g.id === chatId);
+            if (!cible) {
+                console.error('Contact ou groupe non trouvé');
+                return;
             }
+            type = "groupe";
+        }
 
-            if (retourListe) {
-                retourListe.addEventListener('click', () => {
-                    MessagesController.afficherAllMessages();
-                });
+        const menu = document.createElement('div');
+        menu.className = 'menu-contextuel';
+        menu.innerHTML = optionContact.option(chatId, cible, type);
+
+        menu.style.top = `${(rect.bottom + 15) - parentRect.top}px`;
+        menu.style.right = `${rect.right - parentRect.left}px`;
+        menu.style.position = "absolute";
+        menu.style.zIndex = 1000;
+
+        if (e.target.closest('.bloquer-contact')) await BloquerContact(e);
+        if (e.target.closest('.debloquer-contact')) await DebloquerContact(e);
+
+        trigger.closest('#optionContact').appendChild(menu);
+
+        const ClickOutside = (event) => {
+            if (!menu.contains(event.target) && !trigger.contains(event.target)) {
+                menu.remove();
+                document.removeEventListener('click', ClickOutside);
             }
-        }
+        };
 
-        const menuContextuel = document.querySelector('.menu-contextuel');
-        if (menuContextuel) {
-            menuContextuel.remove();
-        }
-    }
-
-    if (e.target.closest('.supprimer-contact')) {
-        const chatId = e.target.closest('.supprimer-contact').dataset.chatId;
-
-        document.body.insertAdjacentHTML('beforeend', Components.PopupSuppression(chatId));
-
-        const menuContextuel = document.querySelector('.menu-contextuel');
-        if (menuContextuel) {
-            menuContextuel.remove();
-        }
-    }
-
-    if (e.target.id === 'annuler-suppression') {
-        const popup = document.querySelector('#popup-overlay');
-        if (popup) {
-            popup.remove();
-        }
-    }
-
-    if (e.target.id === 'confirmer-suppression') {
-        const chatId = e.target.dataset.chatId;
-        const userId = sessionStorage.getItem('userId');
-
-        try {
-            const response = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
-            if (!response.ok) throw new Error('Erreur de récupération des données');
-
-            const userData = await response.json();
-
-            userData.contacts = userData.contacts.filter(c => c.id !== chatId);
-
-            const updateResponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    contacts: userData.contacts
-                })
-            });
-
-            if (!updateResponse.ok) throw new Error('Erreur lors de la suppression');
-
-            const popup = document.querySelector('#popup-overlay');
-            if (popup) {
-                popup.remove();
-            }
-
-            MessagesController.afficherAllMessages();
-
-        } catch (error) {
-            console.error('Erreur lors de la suppression:', error);
-        }
+        setTimeout(() => {
+            document.addEventListener('click', ClickOutside);
+        }, 100);
     }
 });
+
+
+document.body.addEventListener('click', async(e) => {
+    if (e.target.closest('.modifier-contact')) ModifierContact(e);
+    if (e.target.closest('.bloquer-contact')) await BloquerContact(e);
+    if (e.target.closest('.debloquer-contact')) await DebloquerContact(e);
+    if (e.target.closest('.supprimer-contact')) PopupSuppression(e);
+    if (e.target.id === 'annuler-suppression') AnnulerSuppression();
+    if (e.target.id === 'confirmer-suppression') await ConfirmerSuppression(e);
+});
+
+function ModifierContact(e) {
+    const chatId = e.target.closest('.modifier-contact').dataset.chatId;
+    const contactToEdit = dbData.contact.find(c => c.id === chatId);
+    if (!contactToEdit) return;
+
+    ListeMessages.innerHTML = Components.AjoutContact({
+        mode: 'edition',
+        contact: contactToEdit
+    });
+
+    setupFormModification(chatId);
+    setupRetourListe();
+    removeMenuContextuel();
+}
+
+function setupFormModification(chatId) {
+    const formContact = document.querySelector('#form-contact');
+    if (!formContact) return;
+
+    formContact.addEventListener('submit', async(e) => {
+        e.preventDefault();
+        const formData = new FormData(formContact);
+        const contactModifie = {
+            id: chatId,
+            prenom: formData.get('prenom'),
+            nom: formData.get('nom'),
+            numero: formData.get('telephone')
+        };
+        try {
+            const success = await contact.modifierContact(chatId, contactModifie);
+            if (success) MessagesController.afficherAllMessages();
+        } catch (error) {
+            console.error('Erreur lors de la modification:', error);
+        }
+    });
+}
+
+function setupRetourListe() {
+    const retourListe = document.querySelector('#backButton');
+    if (retourListe) {
+        retourListe.addEventListener('click', () => {
+            MessagesController.afficherAllMessages();
+        });
+    }
+}
+
+async function BloquerContact(e) {
+    const chatId = e.target.closest('.bloquer-contact').dataset.chatId;
+    if (await actionContact.bloquerContact(chatId)) {
+        MessagesController.afficherAllMessages();
+    }
+    removeMenuContextuel();
+}
+
+async function DebloquerContact(e) {
+    const chatId = e.target.closest('.debloquer-contact').dataset.chatId;
+    if (await actionContact.debloquerContact(chatId)) {
+        MessagesController.afficherAllMessages();
+    }
+    removeMenuContextuel();
+}
+
+function PopupSuppression(e) {
+    const chatId = e.target.closest('.supprimer-contact').dataset.chatId;
+    document.body.insertAdjacentHTML('beforeend', Components.PopupSuppression(chatId));
+    removeMenuContextuel();
+}
+
+function AnnulerSuppression() {
+    const popup = document.querySelector('#popup-overlay');
+    if (popup) popup.remove();
+}
+
+async function ConfirmerSuppression(e) {
+    const chatId = e.target.dataset.chatId;
+    const userId = sessionStorage.getItem('userId');
+    try {
+        const response = await fetch(`${url}/${userId}`);
+        if (!response.ok) throw new Error('Erreur de récupération des données');
+
+        const userData = await response.json();
+        userData.contacts = userData.contacts.filter(c => c.id !== chatId);
+
+        await updateContacts(userId, userData.contacts);
+        removePopup();
+        MessagesController.afficherAllMessages();
+    } catch (error) {
+        console.error('Erreur lors de la suppression:', error);
+    }
+}
+
+async function updateContacts(userId, contacts) {
+    const updateResponse = await fetch(`${url}/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contacts })
+    });
+    if (!updateResponse.ok) throw new Error('Erreur lors de la mise à jour');
+}
+
+function removePopup() {
+    const popup = document.querySelector('#popup-overlay');
+    if (popup) popup.remove();
+}
+
+function removeMenuContextuel() {
+    const menuContextuel = document.querySelector('.menu-contextuel');
+    if (menuContextuel) menuContextuel.remove();
+}
+
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -345,99 +413,217 @@ document.addEventListener('click', (e) => {
     }
 });
 
+const FormContact = function(formContact) {
+    if (formContact) {
+        formContact.addEventListener('submit', async(e) => {
+            e.preventDefault();
+            const formData = new FormData(formContact);
+
+            const nouveauContact = {
+                id: formData.get('numero'),
+                numero: formData.get('numero'),
+                prenom: formData.get('prenom'),
+                nom: formData.get('nom'),
+                lastMessage: "",
+                blocked: false,
+                archived: false,
+                epingler: false,
+                nbreNonLu: 0,
+                messages: [],
+
+
+            };
+
+            try {
+                const success = await contact.sauvegarderContact(nouveauContact);
+                if (success) {
+                    MessagesController.afficherAllMessages();
+                }
+            } catch (error) {
+                console.error('Erreur lors de l\'ajout:', error);
+            }
+        });
+    }
+}
+
+const formGroupe = function(formGroupe) {
+    if (formContact) {
+        formContact.addEventListener('submit', async(e) => {
+            e.preventDefault();
+            const formData = new FormData(formGroupe);
+
+            const nouveauGroupe = {
+                id: formData.get('numero'),
+                numero: formData.get('numero'),
+                prenom: formData.get('prenom'),
+                nom: formData.get('nom'),
+                lastMessage: "",
+                blocked: false,
+                archived: false,
+                epingler: false,
+                nbreNonLu: 0,
+                messages: [],
+
+
+            };
+
+            try {
+                const success = await contact.sauvegarderContact(nouveauContact);
+                if (success) {
+                    MessagesController.afficherAllMessages();
+                }
+            } catch (error) {
+                console.error('Erreur lors de l\'ajout:', error);
+            }
+        });
+    }
+}
+
+
+function NewContactClique() {
+    const ListeMessages = document.querySelector('#ListeMessages');
+    ListeMessages.innerHTML = Components.AjoutContact({ mode: 'creation' });
+
+    const formContact = document.querySelector('#form-contact');
+    const retourListe = document.querySelector('#backButton');
+
+    FormContact(formContact);
+
+    if (retourListe) {
+        retourListe.addEventListener('click', MessagesController.afficherAllMessages);
+    }
+}
+
+function getChatIdFromEvent(e) {
+    const element = e.target.closest('.modifier-contact');
+    return element ? element.dataset.chatId : null;
+}
+
+
+function getContactById(id) {
+    return dbData.contact.find(c => c.id === id);
+}
+
+function renderEditContactForm(contact) {
+    const ListeMessages = document.querySelector('#ListeMessages');
+    ListeMessages.innerHTML = Components.AjoutContact({
+        mode: 'edition',
+        contact: contact
+    });
+}
+
+function setupContactFormSubmit(chatId) {
+    const formContact = document.querySelector('#form-contact');
+    if (!formContact) return;
+
+    formContact.addEventListener('submit', async(e) => {
+        e.preventDefault();
+        const formData = new FormData(formContact);
+
+        const contactModifie = {
+            id: chatId,
+            numero: formData.get('numero'),
+            prenom: formData.get('prenom'),
+            nom: formData.get('nom')
+        };
+
+        try {
+            const success = await contact.modifierContact(chatId, contactModifie);
+            if (success) {
+                MessagesController.afficherAllMessages();
+            }
+        } catch (error) {
+            console.error('Erreur lors de la modification:', error);
+        }
+    });
+}
+
+
+async function ModifierContactClick(e) {
+    const chatId = getChatIdFromEvent(e);
+    const contactToEdit = getContactById(chatId);
+    if (!contactToEdit) return;
+
+    renderEditContactForm(contactToEdit);
+    setupContactFormSubmit(chatId);
+    setupRetourListeClick();
+    removeMenuContextuel();
+}
+
+
+function handleBackButtonClick() {
+    MessagesController.afficherAllMessages();
+}
+
+
 document.addEventListener('click', async(e) => {
     if (e.target.id === 'newContact' || e.target.closest('#newContact')) {
-        const ListeMessages = document.querySelector('#ListeMessages');
-        ListeMessages.innerHTML = Components.AjoutContact({ mode: 'creation' });
+        NewContactClique();
+    }
 
-        const formContact = document.querySelector('#form-contact');
-        const retourListe = document.querySelector('#retour-liste');
-
-        if (formContact) {
-            formContact.addEventListener('submit', async(e) => {
-                e.preventDefault();
-                const formData = new FormData(formContact);
-
-                const nouveauContact = {
-                    id: formData.get('numero'),
-                    numero: formData.get('numero'),
-                    prenom: formData.get('prenom'),
-                    nom: formData.get('nom'),
-                    lastMessage: "",
-                    nbreNonLu: 0,
-                    messages: [],
-                    epingler: false,
-                    archiver: false
-                };
-
-                try {
-                    const success = await contact.sauvegarderContact(nouveauContact);
-                    if (success) {
-                        MessagesController.afficherAllMessages();
-                    }
-                } catch (error) {
-                    console.error('Erreur lors de l\'ajout:', error);
-                }
-            });
-        }
-
-        if (retourListe) {
-            retourListe.addEventListener('click', () => {
-                MessagesController.afficherAllMessages();
-            });
-        }
+    if (e.target.id === 'creationGroupe' || e.target.closest('#creationGroupe')) {
+        NewGroupeClique(recharger);
     }
 
     if (e.target.closest('.modifier-contact')) {
-        const chatId = e.target.closest('.modifier-contact').dataset.chatId;
-        const contactToEdit = dbData.contact.find(c => c.id === chatId);
-
-        if (contactToEdit) {
-            const ListeMessages = document.querySelector('#ListeMessages');
-            ListeMessages.innerHTML = Components.AjoutContact({
-                mode: 'edition',
-                contact: contactToEdit
-            });
-
-            const formContact = document.querySelector('#form-contact');
-            const retourListe = document.querySelector('#retour-liste');
-
-            if (formContact) {
-                formContact.addEventListener('submit', async(e) => {
-                    e.preventDefault();
-                    const formData = new FormData(formContact);
-
-                    const contactModifie = {
-                        id: chatId,
-                        numero: formData.get('numero'),
-                        prenom: formData.get('prenom'),
-                        nom: formData.get('nom')
-                    };
-
-                    try {
-                        const success = await contact.modifierContact(chatId, contactModifie);
-                        if (success) {
-                            MessagesController.afficherAllMessages();
-                        }
-                    } catch (error) {
-                        console.error('Erreur lors de la modification:', error);
-                    }
-                });
-            }
-
-            if (retourListe) {
-                retourListe.addEventListener('click', () => {
-                    MessagesController.afficherAllMessages();
-                });
-            }
-        }
-
-        const menuContextuel = document.querySelector('.menu-contextuel');
-        if (menuContextuel) {
-            menuContextuel.remove();
-        }
+        await ModifierContactClick(e);
     }
+
     if (e.target.id === 'backButton' || e.target.closest('#backButton')) {
-        MessagesController.afficherAllMessages();
+        handleBackButtonClick();
     }
 });
+
+
+
+profil.addEventListener("click", (e) => {
+    if (e.target.id === 'profil' || e.target.closest("#profil")) {
+        gauche.innerHTML = "";
+        gauche.innerHTML = Profil.profil();
+
+        recharger()
+    }
+})
+
+function recharger() {
+    document.addEventListener('click', function handleRetour(e) {
+        const retourBtn = e.target.closest('#retour');
+        if (retourBtn) {
+            renderContactsUI();
+            document.removeEventListener('click', handleRetour);
+        }
+    });
+}
+
+function renderContactsUI() {
+    gauche.innerHTML = layout.gauche();
+    MessagesController.afficherAllMessages();
+    attacherEventListener();
+}
+
+function attacherEventListener() {
+    const addButton = document.querySelector('#add');
+    const ListeMessages = document.querySelector('#ListeMessages');
+    if (addButton) {
+        addButton.addEventListener('click', () => {
+            if (dbData.contact || dbData.groupe) {
+                ListeMessages.innerHTML = ComponentsAdd.nouveauMenu(dbData);
+                const liste = document.querySelector("#liste-Contacts");
+
+            }
+        });
+    }
+}
+
+
+parametre.addEventListener("click", () => {
+    gauche.innerHTML = layout.parametre();
+
+    const logoutBtn = document.querySelector("#logoutBtn");
+    const BtnDeconnexion = () => {
+        sessionStorage.removeItem('isLoggedIn');
+        sessionStorage.removeItem('username');
+        popupConnexion.classList.replace("hidden", "flex");
+    };
+    logoutBtn.addEventListener('click', BtnDeconnexion);
+})

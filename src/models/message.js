@@ -1,126 +1,132 @@
-export const message = {
-        async envoyerMessage(chatId, contenu) {
-            try {
-                const response = await fetch(`http://localhost:3000/contact/${chatId}`);
-                const contact = await response.json();
+import { MessageSimulator } from "../utils/messageSimulator.js";
 
-                const nouveauMessage = {
-                    id: Date.now().toString(),
-                    texte: contenu,
-                    timestamp: new Date().toISOString(),
-                    envoyeur: 'moi',
-                    statut: 'envoyé'
-                };
-                console.log("je suis le dernier message");
-                contact.messages = contact.messages || [];
-                contact.messages.push(nouveauMessage);
-                contact.lastMessage = contenu;
+const url = "http://localhost:3000/utilisateurs";
 
-                const updateResponse = await fetch(`http://localhost:3000/contact/${chatId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(contact)
-                });
+export const message = (() => ({
+    async response(chatActif, nouveauMessage, userId) {
+        const reponse = await fetch(`${url}/${userId}`);
+        if (!reponse.ok) throw new Error('Erreur de récupération des données');
 
-                if (!updateResponse.ok) {
-                    throw new Error('Erreur lors de la mise à jour du contact');
-                }
+        const userData = await reponse.json();
+        let contactIndex = null;
 
-                return nouveauMessage;
-            } catch (error) {
-                console.error('Erreur lors de l\'envoi du message:', error);
-                return null;
+        contactIndex = userData.groupes.findIndex(c => c.id === chatActif)
+        if (contactIndex !== -1) {
+            contactIndex = userData.groupes.findIndex(c => c.id === chatActif);
+            if (contactIndex === -1) throw new Error('Groupe non trouvé');
+
+            if (!userData.groupes[contactIndex].messages) {
+                userData.groupes[contactIndex].messages = [];
             }
-        },
 
-        afficherConversation(chatId) {
-            const welcomeScreen = document.querySelector('#welcomeScreen');
-            const chatView = document.querySelector('#chatView');
+            userData.groupes[contactIndex].messages.push(nouveauMessage);
+            userData.groupes[contactIndex].lastMessage = nouveauMessage.texte;
 
-            welcomeScreen.classList.add('hidden');
-            chatView.classList.remove('hidden');
+            const updateReponse = await fetch(`${url}/${userId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    groupes: userData.groupes
+                })
+            });
 
-            const chat = [...dbData.contact, ...dbData.groupe].find(c => c.id === chatId);
-            if (chat) {
-                const chatName = chat.type === 'groupe' ? chat.nom : `${chat.prenom} ${chat.nom}`;
-                document.querySelector('#chatContactName').textContent = chatName;
+            if (!updateReponse.ok) throw new Error('Erreur lors de la sauvegarde du message');
 
-                this.definirChatActif(chatId);
+        } else {
+            contactIndex = userData.contacts.findIndex(c => c.id === chatActif);
+            if (contactIndex === -1) throw new Error('Contact non trouvé');
 
-                this.afficherMessages(chatId);
-
-                const messageInput = document.querySelector('#messageInput');
-                const messageForm = document.querySelector('#messageForm');
-
-                if (messageForm) {
-                    messageForm.dataset.chatId = chatId;
-
-                    const envoyerMessage = async(e) => {
-                        e.preventDefault();
-                        const message = messageInput.value.trim();
-                        if (message) {
-                            const success = await this.envoyerMessage(message);
-                            if (success) {
-                                messageInput.value = '';
-                                messageInput.focus();
-                                this.afficherAllMessages();
-                            }
-                        }
-                    };
-
-                    messageForm.removeEventListener('submit', envoyerMessage);
-                    messageForm.addEventListener('submit', envoyerMessage);
-                }
-
-                messageInput.value = '';
-                messageInput.focus();
+            if (!userData.contacts[contactIndex].messages) {
+                userData.contacts[contactIndex].messages = [];
             }
-        },
 
-        ConversationActive: (chat) => {
-                return `
-        <div class="flex flex-col h-full">
-            <div class="bg-wa-container p-4 flex items-center border-b border-wa-border">
-                <div class="flex items-center">
-                    <div class="w-10 h-10 bg-wa-text-secondary rounded-full flex items-center justify-center mr-3">
-                        <i class='bx bxs-user text-xl text-wa-text'></i>
-                    </div>
-                    <div class="text-wa-text font-medium">${chat.prenom} ${chat.nom}</div>
-                </div>
-            </div>
+            userData.contacts[contactIndex].messages.push(nouveauMessage);
+            userData.contacts[contactIndex].lastMessage = nouveauMessage.texte;
 
-            <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 bg-wa-background">
-                ${chat.messages ? chat.messages.map(msg => `
-                    <div class="flex ${msg.envoyeur === 'moi' ? 'justify-end' : 'justify-start'} mb-4">
-                        <div class="max-w-[70%] ${msg.envoyeur === 'moi' ? 'bg-wa-green' : 'bg-wa-darker'} rounded-lg p-3">
-                            <div class="text-wa-text break-words">${msg.texte}</div>
-                            <div class="text-xs text-wa-text-secondary text-right mt-1 flex items-center justify-end gap-1">
-                                ${new Date(msg.timestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
-                                ${msg.envoyeur === 'moi' ? `<i class='bx bx-check'></i>` : ''}
+            const updateReponse = await fetch(`${url}/${userId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contacts: userData.contacts
+                })
+            });
+
+            if (!updateReponse.ok) throw new Error('Erreur lors de la sauvegarde du message');
+        }
+    },
+
+
+    async updateResponse(texte, scrollBottom) {
+
+        const messagesContainer = document.querySelector('#messagesContainer');
+        if (messagesContainer) {
+            const messageHTML = `
+                    <div class="flex justify-end mb-4">
+                        <div class="max-w-[70%] bg-blue-600  rounded-lg p-3">
+                            <div class="text-wa-text break-words">${texte}</div>
+                            <div class="text-xs text-white text-right mt-1">
+                                ${new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
+                                <i class='bx bx-check'></i>
                             </div>
                         </div>
                     </div>
-                `).join('') : ''}
-            </div>
+                `;
+            messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
+            scrollBottom();
+        }
+    },
 
-            <form id="messageForm" class="p-4 border-t border-wa-border">
-                <div class="flex items-center gap-4">
-                    <button type="button" class="text-wa-text-secondary hover:text-wa-text">
-                        <i class='bx bx-smile w-6 h-6'></i>
-                    </button>
-                    <div class="flex-1 rounded-lg bg-wa-darker">
-                        <input type="text" 
-                            id="messageInput" 
-                            class="w-full bg-transparent outline-none px-4 py-2 text-wa-text placeholder-wa-text-secondary"
-                            placeholder="Tapez un message">
-                    </div>
-                    <button type="submit" class="text-wa-text-secondary hover:text-wa-green">
-                        <i class='bx bx-send w-6 h-6'></i>
-                    </button>
-                </div>
-            </form>
-        </div>`;
-    }
-};
+    simulerReponse(chatActif, userId, scrollBottom) {
+
+        (async() => {
+            const reponse = await MessageSimulator.simulerReponse();
+
+            const nouveauMessage = {
+                id: Date.now().toString(),
+                texte: reponse,
+                timestamp: new Date().toISOString(),
+                envoyeur: 'autre',
+                statut: 'lu'
+            };
+            const userResponse = await fetch(`${url}/${userId}`);
+            const userData = await userResponse.json();
+
+            const contactIndex = userData.contacts.findIndex(c => c.id === chatActif);
+            if (contactIndex !== -1) {
+                userData.contacts[contactIndex].messages.push(nouveauMessage);
+                userData.contacts[contactIndex].lastMessage = reponse;
+
+                await fetch(`${url}/${userId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contacts: userData.contacts
+                    })
+                });
+
+                const messagesContainer = document.querySelector('#messagesContainer');
+                if (messagesContainer) {
+                    const messageHTML = `
+                                    <div class="flex justify-start mb-4">
+                                        <div class="max-w-[70%] bg-wa-darker rounded-lg p-3">
+                                            <div class="text-wa-text break-words">${reponse}</div>
+                                            <div class="text-xs text-wa-text-secondary text-right mt-1">
+                                                ${new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                    messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
+
+                    scrollBottom();
+                }
+            }
+        })();
+    },
+}))();
