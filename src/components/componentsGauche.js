@@ -21,7 +21,7 @@ export const layout = {
             <div class="p-4 ">
                 <div class="bg-gray-900 border-2   rounded-xl flex items-center px-3 py-2">
                     <i class='bx bx-search w-5 h-5 text-gray-600 mr-3'></i>
-                    <input type="text" placeholder="Rechercher ou démarrer une discussion" class="bg-transparent outline-none flex-1 text-white placeholder-gray-600">
+                    <input id="recherche" type="text" placeholder="Rechercher ou démarrer une discussion" class="bg-transparent outline-none flex-1 text-white placeholder-gray-600">
                 </div>
             </div>
 
@@ -65,6 +65,7 @@ export const layout = {
                 <i class="fas fa-search text-gray-400 text-sm"></i>
                 </div>
                 <input
+                id="recherche"
                 type="text"
                 placeholder="Rechercher dans les paramètres"
                 class="w-full bg-gray-700 text-white placeholder-gray-400 rounded-full py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"

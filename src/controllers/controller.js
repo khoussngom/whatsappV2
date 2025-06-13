@@ -11,6 +11,8 @@ import { actionContact } from '../models/actionContact.js';
 import { optionContact } from '../components/optionContact.js';
 import { groupe } from '../components/componentGroupe.js';
 import { NewGroupeClique } from './groupe.js';
+import { Recherche } from './recherche.js';
+
 
 const popupConnexion = document.querySelector("#popupConnexion");
 const btnConnexion = document.querySelector("#btnConnexion");
@@ -19,6 +21,7 @@ const gauche = document.querySelector("#gauche");
 const parametre = document.querySelector("#parametre")
 const optionDuContact = document.querySelector("#optionContact")
 const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs";
+const search = document.querySelector("#recherche");
 
 
 const afficherErreur = (message, elementId) => {
@@ -627,3 +630,5 @@ parametre.addEventListener("click", () => {
     };
     logoutBtn.addEventListener('click', BtnDeconnexion);
 })
+
+search.addEventListener("keyup", Recherche);

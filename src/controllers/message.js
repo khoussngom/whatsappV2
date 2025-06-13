@@ -4,7 +4,10 @@ import { MessageSimulator } from '../utils/messageSimulator.js';
 import { message } from '../models/message.js';
 
 const ListeMessages = document.querySelector("#ListeMessages");
-const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs"
+const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs";
+
+export let valFiltre = [];
+
 export const MessagesController = {
         chatActif: null,
         onConversationLoaded: null,
@@ -82,7 +85,6 @@ export const MessagesController = {
 },
 
 
-
     afficherAllMessages() {
         const ListeMessages = document.querySelector("#ListeMessages"); 
         if (!ListeMessages) return;
@@ -90,7 +92,14 @@ export const MessagesController = {
 
         if (dbData.contact && dbData.contact.length > 0) {
 
-            dbData.contact.forEach(contact => {
+                const amis = (valFiltre.length < 1) ? dbData.contact : valFiltre;
+
+                if (!amis || amis.length < 1) {
+                    ListeMessages.innerHTML = "pas de contact disponible !";
+                    return;
+                }
+
+            amis.forEach(contact => {
                 const messageHTML = Components.ListeMessages({
                     ...contact,
                     type: 'contact'
