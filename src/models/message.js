@@ -1,6 +1,8 @@
 import { MessageSimulator } from "../utils/messageSimulator.js";
 
-const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs";
+// const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs";
+const url = "http://localhost:3000/utilisateurs";
+
 
 export const message = (() => ({
     async response(chatActif, nouveauMessage, userId) {
@@ -129,4 +131,54 @@ export const message = (() => ({
             }
         })();
     },
+
+    async envoyerAuDestinataire(destinataireId, message) {
+        try {
+            const response = await fetch(`${url}/${destinataireId}`);
+            if (!response.ok) throw new Error('Destinataire non trouvé');
+
+            const destinataire = await response.json();
+            const expediteurId = sessionStorage.getItem('userId');
+
+
+            if (!destinataire.messages) {
+                destinataire.messages = [];
+            }
+
+
+            let conversation = destinataire.contacts.find(c => c.id === expediteurId);
+            if (!conversation) {
+                throw new Error('Conversation non trouvée');
+            }
+
+            if (!conversation.messages) {
+                conversation.messages = [];
+            }
+
+
+            conversation.messages.push({
+                ...message,
+                envoyeur: expediteurId
+            });
+
+
+            conversation.lastMessage = message.texte;
+
+
+            await fetch(`${url}/${destinataireId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contacts: destinataire.contacts
+                })
+            });
+
+            return true;
+        } catch (error) {
+            console.error('Erreur envoi au destinataire:', error);
+            return false;
+        }
+    }
 }))();

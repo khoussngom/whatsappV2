@@ -1,175 +1,272 @@
-  {
-      "utilisateurs": [{
-          "id": "774730039",
-          "numero": "774730039",
-          "password": "marakhib",
-          "contacts": [{
-                  "id": "784882275",
-                  "numero": "784882275",
-                  "prenom": "saliou",
-                  "nom": "niang",
-                  "lastMessage": "Je reviens vers vous bientôt",
-                  "blocked": false,
-                  "archived": false,
-                  "epingler": false,
-                  "nbreNonLu": 0,
-                  "messages": [{
-                          "id": 1749140818036,
-                          "texte": "mouride",
-                          "timestamp": "2025-06-05T16:26:58.036Z",
-                          "envoyeur": "moi",
-                          "statut": "envoyé"
-                      },
-                      {
-                          "id": "1749723105499",
-                          "texte": "ziar",
-                          "timestamp": "2025-06-12T10:11:45.499Z",
-                          "envoyeur": "moi",
-                          "statut": "envoyé"
-                      },
-                      {
-                          "id": "1749723105529",
-                          "texte": "On peut en discuter plus tard ?",
-                          "timestamp": "2025-06-12T10:11:45.529Z",
-                          "envoyeur": "autre",
-                          "statut": "lu"
-                      },
-                      {
-                          "id": "1749734845316",
-                          "texte": "salut",
-                          "timestamp": "2025-06-12T13:27:25.316Z",
-                          "envoyeur": "moi",
-                          "statut": "envoyé"
-                      },
-                      {
-                          "id": "1749734845348",
-                          "texte": "Je reviens vers vous bientôt",
-                          "timestamp": "2025-06-12T13:27:25.348Z",
-                          "envoyeur": "autre",
-                          "statut": "lu"
-                      }
-                  ]
-              },
-              {
-                  "id": "771234567",
-                  "numero": "771234567",
-                  "prenom": "fallou",
-                  "nom": "ndiaye",
-                  "lastMessage": "D'accord, je comprends",
-                  "blocked": false,
-                  "archived": false,
-                  "epingler": false,
-                  "nbreNonLu": 0,
-                  "messages": [{
-                          "id": "1749489343931",
-                          "texte": "ziar",
-                          "timestamp": "2025-06-09T17:15:43.931Z",
-                          "envoyeur": "moi",
-                          "statut": "envoyé"
-                      },
-                      {
-                          "id": "1749769277299",
-                          "texte": "ok",
-                          "timestamp": "2025-06-12T23:01:17.299Z",
-                          "envoyeur": "moi",
-                          "statut": "envoyé"
-                      },
-                      {
-                          "id": "1749769277329",
-                          "texte": "D'accord, je comprends",
-                          "timestamp": "2025-06-12T23:01:17.329Z",
-                          "envoyeur": "autre",
-                          "statut": "lu"
-                      },
-                      {
-                          "id": "1749769389189",
-                          "texte": "ziar",
-                          "timestamp": "2025-06-12T23:03:09.189Z",
-                          "envoyeur": "moi",
-                          "statut": "envoyé"
-                      },
-                      {
-                          "id": "1749769389218",
-                          "texte": "D'accord, je comprends",
-                          "timestamp": "2025-06-12T23:03:09.218Z",
-                          "envoyeur": "autre",
-                          "statut": "lu"
-                      }
-                  ]
-              },
-              {
-                  "id": "777765445",
-                  "numero": "777765445",
-                  "prenom": "khadim",
-                  "nom": "ngom",
-                  "lastMessage": "",
-                  "blocked": false,
-                  "archived": false,
-                  "epingler": false,
-                  "nbreNonLu": 0,
-                  "messages": []
-              }
-          ],
-          "groupes": [{
-                  "id": "breukh",
-                  "nom": "breukh",
-                  "type": "groupe",
-                  "membres": [{
-                      "numero": "774730039",
-                      "role": "admin"
-                  }],
-                  "description": "groupe Aly",
-                  "lastMessage": "breukh",
-                  "nbreNonLu": 1,
-                  "messages": [{
-                          "id": 1,
-                          "texte": "wa groupe bi",
-                          "timestamp": "2024-06-05T09:30:00",
-                          "envoyeur": "774730039",
-                          "statut": "lu"
-                      },
-                      {
-                          "id": "1749771063765",
-                          "texte": "breukh",
-                          "timestamp": "2025-06-12T23:31:03.765Z",
-                          "envoyeur": "moi",
-                          "statut": "envoyé"
-                      }
-                  ],
-                  "epingler": false,
-                  "archiver": false
-              },
-              {
-                  "id": "1749764794616",
-                  "nom": "test",
-                  "type": "groupe",
-                  "admin": [
-                      "774730039"
-                  ],
-                  "membres": [
-                      "784882275",
-                      "771234567"
-                  ],
-                  "messages": [{
-                          "id": "1749769302225",
-                          "texte": "ok",
-                          "timestamp": "2025-06-12T23:01:42.225Z",
-                          "envoyeur": "moi",
-                          "statut": "envoyé"
-                      },
-                      {
-                          "id": "1749769370005",
-                          "texte": "ok",
-                          "timestamp": "2025-06-12T23:02:50.005Z",
-                          "envoyeur": "moi",
-                          "statut": "envoyé"
-                      }
-                  ],
-                  "epingler": false,
-                  "archiver": false,
-                  "lastMessage": "ok",
-                  "nbreNonLu": 0
-              }
-          ]
-      }]
-  }
+{
+    "utilisateurs": [{
+            "id": "774730039",
+            "numero": "774730039",
+            "password": "marakhib",
+            "contacts": [{
+                    "id": "784882275",
+                    "numero": "784882275",
+                    "prenom": "saliou",
+                    "nom": "niang",
+                    "lastMessage": "nakamou",
+                    "blocked": false,
+                    "archived": false,
+                    "epingler": false,
+                    "nbreNonLu": 0,
+                    "messages": [{
+                            "id": 1749140818036,
+                            "texte": "mouride",
+                            "timestamp": "2025-06-05T16:26:58.036Z",
+                            "envoyeur": "moi",
+                            "statut": "envoyé"
+                        },
+                        {
+                            "id": "1749723105499",
+                            "texte": "ziar",
+                            "timestamp": "2025-06-12T10:11:45.499Z",
+                            "envoyeur": "moi",
+                            "statut": "envoyé"
+                        },
+                        {
+                            "id": "1749723105529",
+                            "texte": "On peut en discuter plus tard ?",
+                            "timestamp": "2025-06-12T10:11:45.529Z",
+                            "envoyeur": "autre",
+                            "statut": "lu"
+                        },
+                        {
+                            "id": "1749734845316",
+                            "texte": "salut",
+                            "timestamp": "2025-06-12T13:27:25.316Z",
+                            "envoyeur": "moi",
+                            "statut": "envoyé"
+                        },
+                        {
+                            "id": "1749734845348",
+                            "texte": "Je reviens vers vous bientôt",
+                            "timestamp": "2025-06-12T13:27:25.348Z",
+                            "envoyeur": "autre",
+                            "statut": "lu"
+                        },
+                        {
+                            "id": "1749815007854",
+                            "texte": "fall",
+                            "timestamp": "2025-06-13T11:43:27.854Z",
+                            "envoyeur": "774730039",
+                            "statut": "envoyé"
+                        },
+                        {
+                            "id": "1749815039181",
+                            "texte": "saliou",
+                            "timestamp": "2025-06-13T11:43:59.181Z",
+                            "envoyeur": "774730039",
+                            "statut": "envoyé"
+                        },
+                        {
+                            "id": "1749815168470",
+                            "texte": "nakamou",
+                            "timestamp": "2025-06-13T11:46:08.470Z",
+                            "envoyeur": "784882275",
+                            "statut": "envoyé"
+                        }
+                    ]
+                },
+                {
+                    "id": "771234567",
+                    "numero": "771234567",
+                    "prenom": "fallou",
+                    "nom": "ndiaye",
+                    "lastMessage": "D'accord, je comprends",
+                    "blocked": false,
+                    "archived": false,
+                    "epingler": false,
+                    "nbreNonLu": 0,
+                    "messages": [{
+                            "id": "1749489343931",
+                            "texte": "ziar",
+                            "timestamp": "2025-06-09T17:15:43.931Z",
+                            "envoyeur": "moi",
+                            "statut": "envoyé"
+                        },
+                        {
+                            "id": "1749769277299",
+                            "texte": "ok",
+                            "timestamp": "2025-06-12T23:01:17.299Z",
+                            "envoyeur": "moi",
+                            "statut": "envoyé"
+                        },
+                        {
+                            "id": "1749769277329",
+                            "texte": "D'accord, je comprends",
+                            "timestamp": "2025-06-12T23:01:17.329Z",
+                            "envoyeur": "autre",
+                            "statut": "lu"
+                        },
+                        {
+                            "id": "1749769389189",
+                            "texte": "ziar",
+                            "timestamp": "2025-06-12T23:03:09.189Z",
+                            "envoyeur": "moi",
+                            "statut": "envoyé"
+                        },
+                        {
+                            "id": "1749769389218",
+                            "texte": "D'accord, je comprends",
+                            "timestamp": "2025-06-12T23:03:09.218Z",
+                            "envoyeur": "autre",
+                            "statut": "lu"
+                        }
+                    ]
+                },
+                {
+                    "id": "777765445",
+                    "numero": "777765445",
+                    "prenom": "khadim",
+                    "nom": "ngom",
+                    "lastMessage": "",
+                    "blocked": false,
+                    "archived": false,
+                    "epingler": false,
+                    "nbreNonLu": 0,
+                    "messages": []
+                },
+                {
+                    "id": "770979968",
+                    "numero": "770979968",
+                    "prenom": "laye",
+                    "nom": "ngom",
+                    "lastMessage": "",
+                    "blocked": false,
+                    "archived": false,
+                    "epingler": false,
+                    "nbreNonLu": 0,
+                    "messages": []
+                }
+            ],
+            "groupes": [{
+                    "id": "breukh",
+                    "nom": "breukh",
+                    "type": "groupe",
+                    "membres": [{
+                        "numero": "774730039",
+                        "role": "admin"
+                    }],
+                    "description": "groupe Aly",
+                    "lastMessage": "breukh",
+                    "nbreNonLu": 1,
+                    "messages": [{
+                            "id": 1,
+                            "texte": "wa groupe bi",
+                            "timestamp": "2024-06-05T09:30:00",
+                            "envoyeur": "774730039",
+                            "statut": "lu"
+                        },
+                        {
+                            "id": "1749771063765",
+                            "texte": "breukh",
+                            "timestamp": "2025-06-12T23:31:03.765Z",
+                            "envoyeur": "moi",
+                            "statut": "envoyé"
+                        }
+                    ],
+                    "epingler": false,
+                    "archiver": false
+                },
+                {
+                    "id": "1749764794616",
+                    "nom": "test",
+                    "type": "groupe",
+                    "admin": [
+                        "774730039"
+                    ],
+                    "membres": [
+                        "784882275",
+                        "771234567"
+                    ],
+                    "messages": [{
+                            "id": "1749769302225",
+                            "texte": "ok",
+                            "timestamp": "2025-06-12T23:01:42.225Z",
+                            "envoyeur": "moi",
+                            "statut": "envoyé"
+                        },
+                        {
+                            "id": "1749769370005",
+                            "texte": "ok",
+                            "timestamp": "2025-06-12T23:02:50.005Z",
+                            "envoyeur": "moi",
+                            "statut": "envoyé"
+                        }
+                    ],
+                    "epingler": false,
+                    "archiver": false,
+                    "lastMessage": "ok",
+                    "nbreNonLu": 0
+                }
+            ]
+        },
+        {
+            "id": "784882275",
+            "numero": "784882275",
+            "password": "marakhib",
+            "nom": "",
+            "prenom": "",
+            "contacts": [{
+                "id": "774730039",
+                "numero": "774730039",
+                "prenom": "khouss",
+                "nom": "ngom",
+                "lastMessage": "nakamou",
+                "blocked": false,
+                "archived": false,
+                "epingler": false,
+                "nbreNonLu": 0,
+                "messages": [{
+                        "id": "1749812994021",
+                        "texte": "fall",
+                        "timestamp": "2025-06-13T11:09:54.021Z",
+                        "envoyeur": "784882275",
+                        "statut": "envoyé"
+                    },
+                    {
+                        "id": "1749814439720",
+                        "texte": "goor",
+                        "timestamp": "2025-06-13T11:33:59.720Z",
+                        "envoyeur": "784882275",
+                        "statut": "envoyé"
+                    },
+                    {
+                        "id": "1749814602214",
+                        "texte": "wa",
+                        "timestamp": "2025-06-13T11:36:42.214Z",
+                        "envoyeur": "784882275",
+                        "statut": "envoyé"
+                    },
+                    {
+                        "id": "1749815007854",
+                        "texte": "fall",
+                        "timestamp": "2025-06-13T11:43:27.854Z",
+                        "envoyeur": "774730039",
+                        "statut": "envoyé"
+                    },
+                    {
+                        "id": "1749815039181",
+                        "texte": "saliou",
+                        "timestamp": "2025-06-13T11:43:59.181Z",
+                        "envoyeur": "774730039",
+                        "statut": "envoyé"
+                    },
+                    {
+                        "id": "1749815168470",
+                        "texte": "nakamou",
+                        "timestamp": "2025-06-13T11:46:08.470Z",
+                        "envoyeur": "784882275",
+                        "statut": "envoyé"
+                    }
+                ]
+            }],
+            "groupes": [],
+            "status": "Hey! J'utilise WhatsApp"
+        }
+    ]
+}

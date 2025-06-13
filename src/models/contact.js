@@ -1,6 +1,8 @@
 import dbData from '../database/db.json';
 
-const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs";
+// const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs";
+const url = "http://localhost:3000/utilisateurs";
+
 
 export const contact = (() => ({
     async chargerDonnees() {

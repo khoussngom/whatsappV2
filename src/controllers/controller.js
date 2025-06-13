@@ -19,9 +19,13 @@ const popupConnexion = document.querySelector("#popupConnexion");
 const btnConnexion = document.querySelector("#btnConnexion");
 const profil = document.querySelector("#profil");
 const gauche = document.querySelector("#gauche");
-const parametre = document.querySelector("#parametre")
-const optionDuContact = document.querySelector("#optionContact")
-const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs";
+const parametre = document.querySelector("#parametre");
+const optionDuContact = document.querySelector("#optionContact");
+const nosMessages = document.querySelector("#nosMessages");
+
+// const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs";
+const url = "http://localhost:3000/utilisateurs";
+
 const search = document.querySelector("#recherche");
 
 
@@ -52,10 +56,10 @@ const connexion = async(e) => {
 
         const utilisateurs = await response.json();
         let utilisateur = utilisateurs[0];
+
         const userId = sessionStorage.getItem("userId");
 
         if (!utilisateur) {
-
             const nouvelUtilisateur = {
                 id: userId,
                 numero: username,
@@ -79,6 +83,7 @@ const connexion = async(e) => {
 
             utilisateur = nouvelUtilisateur;
         } else {
+
             if (utilisateur.password !== password) {
                 throw new Error("Mot de passe incorrect");
             }
@@ -97,6 +102,7 @@ const connexion = async(e) => {
         afficherErreur(error.message, 'username');
     }
 }
+
 
 const verifierConnexion = async function() {
     const est_connecte = sessionStorage.getItem("isLoggedIn");
@@ -477,39 +483,6 @@ const FormContact = function(formContact) {
     }
 }
 
-const formGroupe = function(formGroupe) {
-    if (formContact) {
-        formContact.addEventListener('submit', async(e) => {
-            e.preventDefault();
-            const formData = new FormData(formGroupe);
-
-            const nouveauGroupe = {
-                id: formData.get('numero'),
-                numero: formData.get('numero'),
-                prenom: formData.get('prenom'),
-                nom: formData.get('nom'),
-                lastMessage: "",
-                blocked: false,
-                archived: false,
-                epingler: false,
-                nbreNonLu: 0,
-                messages: [],
-
-
-            };
-
-            try {
-                const success = await contact.sauvegarderContact(nouveauContact);
-                if (success) {
-                    MessagesController.afficherAllMessages();
-                }
-            } catch (error) {
-                console.error('Erreur lors de l\'ajout:', error);
-            }
-        });
-    }
-}
-
 
 function NewContactClique() {
     const ListeMessages = document.querySelector('#ListeMessages');
@@ -660,3 +633,7 @@ parametre.addEventListener("click", () => {
 })
 
 search.addEventListener("keyup", Recherche);
+
+nosMessages.addEventListener("click", () => {
+    MessagesController.afficherAllMessages();
+})
