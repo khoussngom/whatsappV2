@@ -1,6 +1,6 @@
 import { MessageSimulator } from "../utils/messageSimulator.js";
 
-const url = "http://localhost:3000/utilisateurs";
+const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs";
 
 export const message = (() => ({
     async response(chatActif, nouveauMessage, userId) {
