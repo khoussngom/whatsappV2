@@ -1,3 +1,4 @@
+const url = "http://localhost:3000/utilisateurs"
 export const ServiceValidation = {
     validerNumero(numero) {
         if (!numero) {
@@ -11,7 +12,7 @@ export const ServiceValidation = {
 
     async verifierNumeroExistant(numero) {
         try {
-            const response = await fetch('http://localhost:3000/utilisateurs');
+            const response = await fetch(`${url}`);
             const utilisateurs = await response.json();
             if (utilisateurs.some(user => user.numero === numero)) {
                 throw new Error("Ce numéro existe déjà");

@@ -4,7 +4,7 @@ import { MessageSimulator } from '../utils/messageSimulator.js';
 import { message } from '../models/message.js';
 
 const ListeMessages = document.querySelector("#ListeMessages");
-
+const url = "http://localhost:3000/utilisateurs"
 export const MessagesController = {
         chatActif: null,
         onConversationLoaded: null,
@@ -50,7 +50,7 @@ export const MessagesController = {
             const userId = sessionStorage.getItem('userId');
             if (!userId) return;
 
-            fetch(`http://localhost:3000/utilisateurs/${userId}`)
+            fetch(`${url}/${userId}`)
                 .then(response => response.json())
                 .then(userData => {
                         let source = null;

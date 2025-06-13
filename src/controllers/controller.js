@@ -18,7 +18,7 @@ const profil = document.querySelector("#profil");
 const gauche = document.querySelector("#gauche");
 const parametre = document.querySelector("#parametre")
 const optionDuContact = document.querySelector("#optionContact")
-
+const url = "http://localhost:3000/utilisateurs";
 
 
 const afficherErreur = (message, elementId) => {
@@ -42,7 +42,7 @@ const connexion = async(e) => {
         await ServiceValidation.validerNumero(username);
         cacherErreur('username');
 
-        const response = await fetch(`http://localhost:3000/utilisateurs?numero=${username}`);
+        const response = await fetch(`${url}?numero=${username}`);
         if (!response.ok) throw new Error("Erreur de connexion au serveur");
 
         const utilisateurs = await response.json();
@@ -182,7 +182,7 @@ document.addEventListener('click', async(e) => {
             menuExistant.remove();
         }
         const userId = sessionStorage.getItem("userId");
-        const response = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
+        const response = await fetch(`${url}/${userId}`);
         const userData = await response.json();
         const contact = userData.contacts.find(c => c.id === chatId);
         const menu = document.createElement('div');
@@ -230,7 +230,7 @@ optionDuContact.addEventListener("click", async(e) => {
         }
 
         const userId = sessionStorage.getItem("userId");
-        const response = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
+        const response = await fetch(`${url}/${userId}`);
         const userData = await response.json();
 
         let type = "contact";
@@ -359,7 +359,7 @@ async function ConfirmerSuppression(e) {
     const chatId = e.target.dataset.chatId;
     const userId = sessionStorage.getItem('userId');
     try {
-        const response = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
+        const response = await fetch(`${url}/${userId}`);
         if (!response.ok) throw new Error('Erreur de récupération des données');
 
         const userData = await response.json();
@@ -374,7 +374,7 @@ async function ConfirmerSuppression(e) {
 }
 
 async function updateContacts(userId, contacts) {
-    const updateResponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
+    const updateResponse = await fetch(`${url}/${userId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contacts })

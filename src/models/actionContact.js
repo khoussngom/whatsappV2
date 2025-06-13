@@ -1,8 +1,10 @@
+const url = "http://localhost:3000/utilisateurs"
+
 export const actionContact = (() => ({
     async bloquerContact(contactId) {
         try {
             const userId = sessionStorage.getItem("userId");
-            const response = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
+            const response = await fetch(`${url}/${userId}`);
             const utilisateur = await response.json();
 
             const contactIndex = utilisateur.contacts.findIndex(c => c.id === contactId);
@@ -10,7 +12,7 @@ export const actionContact = (() => ({
 
             utilisateur.contacts[contactIndex].blocked = true;
 
-            const updateResponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
+            const updateResponse = await fetch(`${url}/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
@@ -37,7 +39,7 @@ export const actionContact = (() => ({
     async debloquerContact(contactId) {
         try {
             const userId = sessionStorage.getItem("userId");
-            const response = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
+            const response = await fetch(`${url}/${userId}`);
             const utilisateur = await response.json();
 
             const contactIndex = utilisateur.contacts.findIndex(c => c.id === contactId);
@@ -45,7 +47,7 @@ export const actionContact = (() => ({
 
             utilisateur.contacts[contactIndex].blocked = false;
 
-            const updateResponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
+            const updateResponse = await fetch(`${url}/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'

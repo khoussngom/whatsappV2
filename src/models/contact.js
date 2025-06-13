@@ -1,10 +1,12 @@
 import dbData from '../database/db.json';
 
+const url = "http://localhost:3000/utilisateurs";
+
 export const contact = (() => ({
     async chargerDonnees() {
         try {
             const userId = sessionStorage.getItem("userId");
-            const response = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
+            const response = await fetch(`${url}/${userId}`);
             const utilisateur = await response.json();
 
             if (utilisateur) {
@@ -22,12 +24,12 @@ export const contact = (() => ({
     async sauvegarderContact(nouveauContact) {
         try {
             const userId = sessionStorage.getItem("userId");
-            const response = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
+            const response = await fetch(`${url}/${userId}`);
             const utilisateur = await response.json();
 
             utilisateur.contacts.push(nouveauContact);
 
-            const updateResponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
+            const updateResponse = await fetch(`${url}/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
@@ -56,7 +58,7 @@ export const contact = (() => ({
     async modifierContact(contactId, contactModifie) {
         try {
             const userId = sessionStorage.getItem("userId");
-            const response = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
+            const response = await fetch(`${url}/${userId}`);
             const utilisateur = await response.json();
 
             const index = utilisateur.contacts.findIndex(contact => contact.id === contactId);
@@ -67,7 +69,7 @@ export const contact = (() => ({
                 ...contactModifie
             };
 
-            const updateResponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
+            const updateResponse = await fetch(`${url}/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
@@ -96,7 +98,7 @@ export const contact = (() => ({
     async supprimerContact(contactId) {
         try {
             const userId = sessionStorage.getItem("userId");
-            const response = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
+            const response = await fetch(`${url}/${userId}`);
             const utilisateur = await response.json();
 
             const index = utilisateur.contacts.findIndex(contact => contact.id === contactId);
@@ -104,7 +106,7 @@ export const contact = (() => ({
 
             utilisateur.contacts.splice(index, 1);
 
-            const updateResponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
+            const updateResponse = await fetch(`${url}/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'

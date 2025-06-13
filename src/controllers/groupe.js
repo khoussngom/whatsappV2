@@ -5,6 +5,7 @@ import { popupMessage } from "../components/popupMessage.js";
 
 
 let contactsSelectionnes = [];
+const url = "http://localhost:3000/utilisateurs"
 
 function ajouterDansGroupe(e) {
     e.preventDefault();
@@ -112,12 +113,12 @@ async function form() {
             archiver: false
         };
 
-        const reponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
+        const reponse = await fetch(`${url}/${userId}`);
         const utilisateur = await reponse.json()
         console.log(utilisateur.groupes)
         utilisateur.groupes.push(nouveauGroupe);
 
-        const updateResponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
+        const updateResponse = await fetch(`${url}/${userId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ groupes: utilisateur.groupes })

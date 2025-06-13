@@ -1,8 +1,10 @@
 import { MessageSimulator } from "../utils/messageSimulator.js";
 
+const url = "http://localhost:3000/utilisateurs";
+
 export const message = (() => ({
     async response(chatActif, nouveauMessage, userId) {
-        const reponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
+        const reponse = await fetch(`${url}/${userId}`);
         if (!reponse.ok) throw new Error('Erreur de récupération des données');
 
         const userData = await reponse.json();
@@ -20,7 +22,7 @@ export const message = (() => ({
             userData.groupes[contactIndex].messages.push(nouveauMessage);
             userData.groupes[contactIndex].lastMessage = nouveauMessage.texte;
 
-            const updateReponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
+            const updateReponse = await fetch(`${url}/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
@@ -43,7 +45,7 @@ export const message = (() => ({
             userData.contacts[contactIndex].messages.push(nouveauMessage);
             userData.contacts[contactIndex].lastMessage = nouveauMessage.texte;
 
-            const updateReponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
+            const updateReponse = await fetch(`${url}/${userId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
@@ -90,7 +92,7 @@ export const message = (() => ({
                 envoyeur: 'autre',
                 statut: 'lu'
             };
-            const userResponse = await fetch(`http://localhost:3000/utilisateurs/${userId}`);
+            const userResponse = await fetch(`${url}/${userId}`);
             const userData = await userResponse.json();
 
             const contactIndex = userData.contacts.findIndex(c => c.id === chatActif);
@@ -98,7 +100,7 @@ export const message = (() => ({
                 userData.contacts[contactIndex].messages.push(nouveauMessage);
                 userData.contacts[contactIndex].lastMessage = reponse;
 
-                await fetch(`http://localhost:3000/utilisateurs/${userId}`, {
+                await fetch(`${url}/${userId}`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json'
