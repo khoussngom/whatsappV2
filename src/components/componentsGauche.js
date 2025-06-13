@@ -47,7 +47,12 @@ export const layout = {
         return `<div class="bg-black text-white font-sans">
         <div class="max-w-md mx-auto overflow-y-auto bg-black h-[100%]">
             <!-- Header -->
-            <div class="px-6 py-4">
+            <div class="px-6 py-4 flex">
+                <button id="retour" class="text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                </button>
             <h1 class="text-xl font-medium text-white">Paramètres</h1>
             </div>
 
