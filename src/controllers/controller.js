@@ -23,8 +23,8 @@ const parametre = document.querySelector("#parametre");
 const optionDuContact = document.querySelector("#optionContact");
 const nosMessages = document.querySelector("#nosMessages");
 
-// const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs";
-const url = "http://localhost:3000/utilisateurs";
+const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs";
+// const url = "http://localhost:3000/utilisateurs";
 
 const search = document.querySelector("#recherche");
 

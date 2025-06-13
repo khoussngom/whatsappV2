@@ -5,8 +5,8 @@ import { message } from '../models/message.js';
 
 let valFiltre = [];
 const ListeMessages = document.querySelector("#ListeMessages");
-// const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs";
-const url = "http://localhost:3000/utilisateurs";
+const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs";
+// const url = "http://localhost:3000/utilisateurs";
 
 export const MessagesController = {
         chatActif: null,
