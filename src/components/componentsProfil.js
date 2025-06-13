@@ -3,7 +3,7 @@ export const Profil = (() => ({
         return `<div class="flex flex-col justify-start items-center gap-8 h-full w-full">
                 
                     <div  class="flex flex-row justify-between items-center h-[5%] w-full p-4 pt-8">
-                        <button id="retour" class="text-wa-text hover:bg-wa-hover p-2 rounded-full" >
+                        <button id="retour" class="text-white hover:bg-green p-2 rounded-full" >
                             <i  class='bx bx-arrow-back text-2xl'>  </i>
                         </button>
                     </div>

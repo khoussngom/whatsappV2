@@ -51,7 +51,7 @@ export function NewGroupeClique(recharger = () => {}) {
     if (contactsContainer) {
 
         const compteurHTML = `
-            <div class="text-wa-text px-4 py-2">
+            <div class="text-white px-4 py-2">
                 <span id="selectedCount">0 sélectionné(s)</span>
             </div>
         `;

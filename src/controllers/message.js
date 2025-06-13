@@ -65,8 +65,8 @@ export const MessagesController = {
 
                         const messagesHTML = source.messages ? source.messages.map(msg => `
                 <div class="flex ${msg.envoyeur === 'moi' ? 'justify-end' : 'justify-start'} mb-4">
-                    <div class="max-w-[70%] ${msg.envoyeur === 'moi' ? 'bg-blue-600' : 'bg-wa-darker'} rounded-lg p-3">
-                        <div class="text-wa-text break-words">${msg.texte}</div>
+                    <div class="max-w-[70%] ${msg.envoyeur === 'moi' ? 'bg-blue-600' : 'bg-gray-600'} rounded-lg p-3">
+                        <div class="text-white break-words">${msg.texte}</div>
                         <div class="text-xs text-white text-right mt-1">
                             ${new Date(msg.timestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
                             ${msg.envoyeur === 'moi' ? `<i class='bx bx-check'></i>` : ''}

@@ -114,7 +114,7 @@ export const message = (() => ({
                 if (messagesContainer) {
                     const messageHTML = `
                                     <div class="flex justify-start mb-4">
-                                        <div class="max-w-[70%] bg-wa-darker rounded-lg p-3">
+                                        <div class="max-w-[70%] bg-gray-600 rounded-lg p-3">
                                             <div class="text-wa-text break-words">${reponse}</div>
                                             <div class="text-xs text-wa-text-secondary text-right mt-1">
                                                 ${new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
