@@ -82,55 +82,55 @@ export const message = (() => ({
         }
     },
 
-    simulerReponse(chatActif, userId, scrollBottom) {
+    // simulerReponse(chatActif, userId, scrollBottom) {
 
-        (async() => {
-            const reponse = await MessageSimulator.simulerReponse();
+    //     (async() => {
+    //         const reponse = await MessageSimulator.simulerReponse();
 
-            const nouveauMessage = {
-                id: Date.now().toString(),
-                texte: reponse,
-                timestamp: new Date().toISOString(),
-                envoyeur: 'autre',
-                statut: 'lu'
-            };
-            const userResponse = await fetch(`${url}/${userId}`);
-            const userData = await userResponse.json();
+    //         const nouveauMessage = {
+    //             id: Date.now().toString(),
+    //             texte: reponse,
+    //             timestamp: new Date().toISOString(),
+    //             envoyeur: 'autre',
+    //             statut: 'lu'
+    //         };
+    //         const userResponse = await fetch(`${url}/${userId}`);
+    //         const userData = await userResponse.json();
 
-            const contactIndex = userData.contacts.findIndex(c => c.id === chatActif);
-            if (contactIndex !== -1) {
-                userData.contacts[contactIndex].messages.push(nouveauMessage);
-                userData.contacts[contactIndex].lastMessage = reponse;
+    //         const contactIndex = userData.contacts.findIndex(c => c.id === chatActif);
+    //         if (contactIndex !== -1) {
+    //             userData.contacts[contactIndex].messages.push(nouveauMessage);
+    //             userData.contacts[contactIndex].lastMessage = reponse;
 
-                await fetch(`${url}/${userId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        contacts: userData.contacts
-                    })
-                });
+    //             await fetch(`${url}/${userId}`, {
+    //                 method: 'PATCH',
+    //                 headers: {
+    //                     'Content-Type': 'application/json'
+    //                 },
+    //                 body: JSON.stringify({
+    //                     contacts: userData.contacts
+    //                 })
+    //             });
 
-                const messagesContainer = document.querySelector('#messagesContainer');
-                if (messagesContainer) {
-                    const messageHTML = `
-                                    <div class="flex justify-start mb-4">
-                                        <div class="max-w-[70%] bg-gray-600 rounded-lg p-3">
-                                            <div class="text-wa-text break-words">${reponse}</div>
-                                            <div class="text-xs text-wa-text-secondary text-right mt-1">
-                                                ${new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
-                                            </div>
-                                        </div>
-                                    </div>
-                                `;
-                    messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
+    //             const messagesContainer = document.querySelector('#messagesContainer');
+    //             if (messagesContainer) {
+    //                 const messageHTML = `
+    //                                 <div class="flex justify-start mb-4">
+    //                                     <div class="max-w-[70%] bg-gray-600 rounded-lg p-3">
+    //                                         <div class="text-wa-text break-words">${reponse}</div>
+    //                                         <div class="text-xs text-wa-text-secondary text-right mt-1">
+    //                                             ${new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
+    //                                         </div>
+    //                                     </div>
+    //                                 </div>
+    //                             `;
+    //                 messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
 
-                    scrollBottom();
-                }
-            }
-        })();
-    },
+    //                 scrollBottom();
+    //             }
+    //         }
+    //     })();
+    // },
 
     async envoyerAuDestinataire(destinataireId, message) {
         try {

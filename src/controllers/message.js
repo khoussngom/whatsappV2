@@ -35,8 +35,6 @@ export const MessagesController = {
                     throw new Error('Utilisateur non connecté');
                 }
 
-                alert(userId);
-
                 const nouveauMessage = {
                     id: Date.now().toString(),
                     texte: texte,
