@@ -82,6 +82,28 @@ export const message = (() => ({
         }
     },
 
+    async updateAudioResponse(audioUrl) {
+        const messagesContainer = document.querySelector('#messagesContainer');
+        if (messagesContainer) {
+            const messageHTML = `
+                <div class="flex justify-end mb-4">
+                    <div class="max-w-[70%] bg-blue-600 rounded-lg p-3">
+                        <audio controls class="w-full">
+                            <source src="${audioUrl}" type="audio/mp3">
+                            Votre navigateur ne supporte pas l'élément audio.
+                        </audio>
+                        <div class="text-xs text-white text-right mt-1">
+                            ${new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
+                            <i class='bx bx-check'></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+            messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
+            this.scrollToBottom();
+        }
+    },
+
     // simulerReponse(chatActif, userId, scrollBottom) {
 
     //     (async() => {
@@ -140,11 +162,9 @@ export const message = (() => ({
             const destinataire = await response.json();
             const expediteurId = sessionStorage.getItem('userId');
 
-
             if (!destinataire.messages) {
                 destinataire.messages = [];
             }
-
 
             let conversation = destinataire.contacts.find(c => c.id === expediteurId);
             if (!conversation) {
@@ -154,7 +174,6 @@ export const message = (() => ({
             if (!conversation.messages) {
                 conversation.messages = [];
             }
-
 
             conversation.messages.push({
                 ...message,

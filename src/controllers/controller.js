@@ -12,6 +12,7 @@ import { optionContact } from '../components/optionContact.js';
 import { groupe } from '../components/componentGroupe.js';
 import { NewGroupeClique } from './groupe.js';
 import { Recherche } from './recherche.js';
+import { messageVocal } from './messagesVocal.js';
 
 
 
@@ -637,3 +638,7 @@ search.addEventListener("keyup", Recherche);
 nosMessages.addEventListener("click", () => {
     MessagesController.afficherAllMessages();
 })
+
+document.addEventListener('DOMContentLoaded', () => {
+    messageVocal.ajouterInterfaceEnregistrement();
+});
