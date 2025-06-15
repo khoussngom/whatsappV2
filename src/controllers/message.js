@@ -387,7 +387,6 @@ export const MessagesController = {
                     </div>
                 `;
 
-
             messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
 
             const lastMessage = messagesContainer.lastElementChild;
