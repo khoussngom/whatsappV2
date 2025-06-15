@@ -338,7 +338,6 @@ export const MessagesController = {
                 arrayBuffer[i] = byteString.charCodeAt(i);
             }
 
-            // Créer le blob avec le bon type MIME
             const blob = new Blob([arrayBuffer], { type: mimeString });
             return URL.createObjectURL(blob);
         } catch (error) {
@@ -360,10 +359,9 @@ export const MessagesController = {
         let messageHTML = '';
 
         if (message.type === "audio" && typeof message.audio === "string" && message.audio.startsWith("data:audio")) {
-            // Correction 1: Ajouter this pour appeler la méthode de l'objet
+
             const audioUrl = this.base64ToAudioUrl(message.audio);
 
-            // Correction 2: Construire le HTML pour le message audio
             messageHTML = `
                     <div class="flex ${estEnvoyeur ? 'justify-end' : 'justify-start'} mb-4">
                         <div class="max-w-[70%] ${estEnvoyeur ? 'bg-blue-600' : 'bg-gray-600'} rounded-lg p-3">
@@ -389,14 +387,12 @@ export const MessagesController = {
                     </div>
                 `;
 
-            // Insérer le message dans le conteneur
+
             messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
 
-            // Ajouter les contrôles audio au dernier message
             const lastMessage = messagesContainer.lastElementChild;
             this.ajouterControlsAudio(lastMessage);
         } else {
-            // Code existant pour les messages texte
             messageHTML = `
                     <div class="flex ${estEnvoyeur ? 'justify-end' : 'justify-start'} mb-4">
                         <div class="max-w-[70%] ${estEnvoyeur ? 'bg-blue-600' : 'bg-gray-600'} rounded-lg p-3">
@@ -415,7 +411,6 @@ export const MessagesController = {
         this.scrollToBottom();
     },
 
-    // Utilitaire pour convertir base64 en Blob
     base64ToBlob(base64) {
         const [header, data] = base64.split(',');
         const bytes = atob(data);
@@ -437,7 +432,6 @@ export const MessagesController = {
         });
     },
 
-    // Remplacer la méthode ajouterControlsAudio existante par celle-ci
     ajouterControlsAudio(messageElement) {
         const audio = messageElement.querySelector('audio');
         const playBtn = messageElement.querySelector('.play-btn');
@@ -455,24 +449,20 @@ export const MessagesController = {
             return `${minutes}:${seconds.toString().padStart(2, '0')}`;
         };
 
-        // Charger et stocker la durée de l'audio
         audio.addEventListener('loadedmetadata', () => {
             audioDuration = audio.duration;
             durationSpan.textContent = formatTime(audioDuration);
         });
 
-        // Sauvegarder la progression
         audio.addEventListener('timeupdate', () => {
             if (isNaN(audioDuration) || !isFinite(audioDuration)) return;
             const progress = (audio.currentTime / audioDuration) * 100;
             progressBar.style.width = `${progress}%`;
             durationSpan.textContent = formatTime(audio.currentTime);
 
-            // Sauvegarder la progression
             messageElement.dataset.progress = audio.currentTime;
         });
 
-        // Restaurer la progression sauvegardée
         const savedProgress = messageElement.dataset.progress;
         if (savedProgress) {
             audio.currentTime = parseFloat(savedProgress);

@@ -301,7 +301,6 @@ export const messageVocal = (() => {
             return audioStates;
         },
 
-        // Méthode pour restaurer l'état des audios
         restoreAudioStates(audioStates, messageElement) {
             const messageId = messageElement.getAttribute('data-message-id');
             const savedState = audioStates.get(messageId);
