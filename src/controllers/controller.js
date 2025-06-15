@@ -668,7 +668,7 @@ sendPlus.addEventListener('click', (e) => {
         const parentRect = trigger.closest('#sendFichier').getBoundingClientRect();
 
         menu.style.position = 'absolute';
-        menu.style.top = `${rect.bottom - (parentRect.bottom+420) }px`;
+        menu.style.top = `${rect.top - (parentRect.bottom+380) }px`;
         menu.style.right = `${(parentRect.left+25) - rect.right }px`;
         menu.style.rotate = "-45deg"
         menu.style.zIndex = '1000';
