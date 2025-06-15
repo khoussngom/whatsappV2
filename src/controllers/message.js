@@ -26,7 +26,7 @@ export const MessagesController = {
     },
 
 
-    async envoyerMessage(texte, type = 'text', audioData = null) {
+    async envoyerMessage(texte, type = 'text', mediaData = null) {
         try {
             if (!this.chatActif) {
                 throw new Error('Aucune conversation active');
@@ -37,15 +37,6 @@ export const MessagesController = {
                 throw new Error('Utilisateur non connecté');
             }
 
-            let audioUrl = null;
-            if (type === 'audio' && audioData) {
-                if (typeof audioData === 'string' && audioData.startsWith('data:audio')) {
-                    audioUrl = audioData;
-                } else {
-                    audioUrl = await this.blobToBase64(audioData);
-                }
-            }
-
             const nouveauMessage = {
                 id: Date.now().toString(),
                 type: type,
@@ -53,7 +44,7 @@ export const MessagesController = {
                 envoyeur: userId,
                 statut: 'envoyé',
                 texte: type === 'text' ? texte : '',
-                audio: audioUrl
+                media: type === 'text' ? null : mediaData.media
             };
 
             await message.response(this.chatActif, nouveauMessage, userId);
@@ -83,58 +74,20 @@ export const MessagesController = {
 
                 if (!source || !source.messages) return;
 
-                const existingAudios = messagesContainer.querySelectorAll('audio');
-                existingAudios.forEach(audio => {
-                    if (audio.src && audio.src.startsWith('blob:')) {
-                        URL.revokeObjectURL(audio.src);
-                    }
-                });
-
                 const messagesHTML = source.messages.map(msg => {
-                    if (msg.type === 'audio' && msg.audio) {
-                        const audioUrl = this.base64ToAudioUrl(msg.audio);
-                        if (!audioUrl) return '';
 
-                        return `
-                                <div class="flex ${msg.envoyeur === userId ? 'justify-end' : 'justify-start'} mb-4">
-                                    <div class="max-w-[70%] ${msg.envoyeur === userId ? 'bg-blue-600' : 'bg-gray-600'} rounded-lg p-3">
-                                        <div class="flex items-center gap-2">
-                                            <button class="play-btn text-white">
-                                                <i class='bx bx-play-circle text-2xl'></i>
-                                            </button>
-                                            <div class="flex-1">
-                                                <audio class="hidden" preload="metadata">
-                                                    <source src="${audioUrl}" type="audio/mp3">
-                                                </audio>
-                                                <div class="h-2 bg-gray-300 rounded">
-                                                    <div class="progress-bar h-full w-0 bg-green-500 rounded"></div>
-                                                </div>
-                                            </div>
-                                            <span class="duration text-white text-sm">0:00</span>
-                                        </div>
-                                        <div class="text-xs text-white text-right mt-1">
-                                            ${new Date(msg.timestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
-                                            ${msg.envoyeur === userId ? '<i class="bx bx-check"></i>' : ''}
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                    } else {
-                        return `
-                                <div class="flex ${msg.envoyeur === userId ? 'justify-end' : 'justify-start'} mb-4">
-                                    <div class="max-w-[70%] ${msg.envoyeur === userId ? 'bg-blue-600' : 'bg-gray-600'} rounded-lg p-3">
-                                        <div class="text-white break-words">${msg.texte || ''}</div>
-                                        <div class="text-xs text-white text-right mt-1">
-                                            ${new Date(msg.timestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
-                                            ${msg.envoyeur === userId ? '<i class="bx bx-check"></i>' : ''}
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
+                    if (msg.type === 'image' || msg.type === 'video') {
+                        if (!msg.media || !msg.media.base64) {
+                            console.warn(`Message ${msg.type} reçu sans données media valides`);
+                            return this.createTextMessage(msg, userId);
+                        }
                     }
+
+                    return this.createMessageHTML(msg, userId);
                 }).join('');
 
                 messagesContainer.innerHTML = messagesHTML;
+
 
                 messagesContainer.querySelectorAll('.play-btn').forEach(btn => {
                     const messageElement = btn.closest('.flex');
@@ -144,6 +97,7 @@ export const MessagesController = {
                 });
 
                 this.scrollToBottom();
+
 
                 if (!this.rafraichissementActif) {
                     this.rafraichissementActif = true;
@@ -195,12 +149,15 @@ export const MessagesController = {
     },
 
     createMessageHTML(msg, userId) {
-        if (
-            msg.type === "audio" &&
+
+        const formattedTime = new Date(msg.timestamp).toLocaleTimeString('fr-FR', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        if (msg.type === "audio" &&
             typeof msg.audio === "string" &&
-            msg.audio.startsWith("data:audio") &&
-            msg.audio.split(',')[1] && msg.audio.split(',')[1].trim() !== ""
-        ) {
+            msg.audio.startsWith("data:audio")) {
             const audioUrl = messageVocal.base64ToAudioUrl(msg.audio);
             if (!audioUrl) return '';
 
@@ -222,7 +179,48 @@ export const MessagesController = {
                             <span class="duration text-white text-sm">0:00</span>
                         </div>
                         <div class="text-xs text-white text-right mt-1">
-                            ${new Date(msg.timestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
+                            ${formattedTime}
+                            ${msg.envoyeur === userId ? '<i class="bx bx-check"></i>' : ''}
+                        </div>
+                    </div>
+                </div>
+                `;
+
+        } else if (msg.type === "image") {
+            if (msg.media &&
+                typeof msg.media === 'object' &&
+                msg.media.base64 &&
+                typeof msg.media.base64 === 'string') {
+
+                return `
+                    <div class="flex ${msg.envoyeur === userId ? 'justify-end' : 'justify-start'} mb-4" data-message-id="${msg.id}">
+                        <div class="max-w-[70%] ${msg.envoyeur === userId ? 'bg-blue-600' : 'bg-gray-600'} rounded-lg p-3">
+                            <img src="${msg.media.base64}" alt="Image" class="w-[300px]  rounded-lg">
+                            <div class="text-xs text-white text-right mt-1">
+                                ${formattedTime}
+                                ${msg.envoyeur === userId ? '<i class="bx bx-check"></i>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                console.warn('Message image reçu sans données media valides:', msg.id);
+                return this.createTextMessage({
+                    ...msg,
+                    texte: "Image non disponible"
+                }, userId);
+            }
+
+        } else if (msg.type === "video" && msg.media && typeof msg.media.base64 === "string") {
+            return `
+                <div class="flex ${msg.envoyeur === userId ? 'justify-end' : 'justify-start'} mb-4" data-message-id="${msg.id}">
+                    <div class="max-w-[70%] ${msg.envoyeur === userId ? 'bg-blue-600' : 'bg-gray-600'} rounded-lg p-3">
+                        <video controls class="max-w-full rounded-lg">
+                            <source src="${msg.media.base64}" type="${msg.media.type}">
+                            Votre navigateur ne supporte pas la lecture de vidéos.
+                        </video>
+                        <div class="text-xs text-white text-right mt-1">
+                            ${formattedTime}
                             ${msg.envoyeur === userId ? '<i class="bx bx-check"></i>' : ''}
                         </div>
                     </div>
@@ -234,7 +232,7 @@ export const MessagesController = {
                     <div class="max-w-[70%] ${msg.envoyeur === userId ? 'bg-blue-600' : 'bg-gray-600'} rounded-lg p-3">
                         <div class="text-white break-words">${msg.texte || ''}</div>
                         <div class="text-xs text-white text-right mt-1">
-                            ${new Date(msg.timestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
+                            ${formattedTime}
                             ${msg.envoyeur === userId ? '<i class="bx bx-check"></i>' : ''}
                         </div>
                     </div>
@@ -347,155 +345,212 @@ export const MessagesController = {
     },
 
     afficherMessage(message) {
-        const messagesContainer = document.querySelector('#messagesContainer');
-        if (!messagesContainer) return;
-
-        const estEnvoyeur = message.envoyeur === sessionStorage.getItem('userId');
-        const timestamp = message.timestamp ? new Date(message.timestamp).toLocaleTimeString('fr-FR', {
+        const estEnvoyeur = message.envoyeur === sessionStorage.getItem("username");
+        const timestamp = new Date(message.horodatage).toLocaleTimeString('fr-FR', {
             hour: '2-digit',
             minute: '2-digit'
-        }) : '';
+        });
 
         let messageHTML = '';
 
-        if (message.type === "audio" && typeof message.audio === "string" && message.audio.startsWith("data:audio")) {
-
-            const audioUrl = this.base64ToAudioUrl(message.audio);
-
-            messageHTML = `
-                    <div class="flex ${estEnvoyeur ? 'justify-end' : 'justify-start'} mb-4">
-                        <div class="max-w-[70%] ${estEnvoyeur ? 'bg-blue-600' : 'bg-gray-600'} rounded-lg p-3">
-                            <div class="flex items-center gap-2">
-                                <button class="play-btn text-white">
-                                    <i class='bx bx-play-circle text-2xl'></i>
-                                </button>
-                                <div class="flex-1">
-                                    <audio class="hidden">
-                                        <source src="${audioUrl}" type="audio/mp3">
-                                    </audio>
-                                    <div class="h-2 bg-gray-300 rounded">
-                                        <div class="progress-bar h-full w-0 bg-green-500 rounded"></div>
+        switch (message.type) {
+            case 'audio':
+                if (message.audio && message.audio.startsWith('data:audio')) {
+                    const audioUrl = this.base64ToAudioUrl(message.audio);
+                    if (audioUrl) {
+                        messageHTML = `
+                            <div class="flex ${estEnvoyeur ? 'justify-end' : 'justify-start'} mb-4">
+                                <div class="max-w-[70%] ${estEnvoyeur ? 'bg-green-600' : 'bg-gray-600'} rounded-lg p-3">
+                                    <div class="flex items-center gap-2">
+                                        <button class="play-btn text-white">
+                                            <i class='bx bx-play-circle text-2xl'></i>
+                                        </button>
+                                        <div class="flex-1">
+                                            <audio class="hidden" preload="auto">
+                                                <source src="${audioUrl}" type="audio/mp3">
+                                            </audio>
+                                            <div class="h-2 bg-gray-300 rounded">
+                                                <div class="progress-bar h-full w-0 bg-green-500 rounded"></div>
+                                            </div>
+                                        </div>
+                                        <span class="duration text-white text-sm">0:00</span>
+                                    </div>
+                                    <div class="text-xs text-white text-right mt-1">
+                                        ${timestamp}
+                                        ${estEnvoyeur ? '<i class="bx bx-check-double"></i>' : ''}
                                     </div>
                                 </div>
-                                <span class="duration text-white text-sm">0:00</span>
                             </div>
-                            <div class="text-xs text-white text-right mt-1">
-                                ${timestamp}
-                                ${estEnvoyeur ? '<i class="bx bx-check"></i>' : ''}
-                            </div>
-                        </div>
-                    </div>
-                `;
+                        `;
 
-            messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
+                        // Ajouter les contrôles audio après l'insertion du message
+                        setTimeout(() => {
+                            const lastMessage = document.querySelector('#messages .flex:last-child');
+                            if (lastMessage) {
+                                this.ajouterControlsAudio(lastMessage);
+                            }
+                        }, 0);
+                    }
+                }
+                break;
 
-            const lastMessage = messagesContainer.lastElementChild;
-            this.ajouterControlsAudio(lastMessage);
-        } else {
-            messageHTML = `
-                    <div class="flex ${estEnvoyeur ? 'justify-end' : 'justify-start'} mb-4">
-                        <div class="max-w-[70%] ${estEnvoyeur ? 'bg-blue-600' : 'bg-gray-600'} rounded-lg p-3">
-                            <div class="text-white break-words">${message.texte || ''}</div>
-                            <div class="text-xs text-white text-right mt-1">
-                                ${timestamp}
-                                ${estEnvoyeur ? '<i class="bx bx-check"></i>' : ''}
-                            </div>
-                        </div>
-                    </div>
-                `;
+            case 'image':
 
-            messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
+                console.log('Message image complet:', message);
+
+                function getImageSource(msg) {
+                    if (msg.media && msg.media.base64) {
+                        return msg.media.base64;
+                    }
+                    if (msg.base64) {
+                        return msg.base64;
+                    }
+                    if (msg.image) {
+                        return msg.image;
+                    }
+                    if (typeof msg === 'object') {
+                        for (let key in msg) {
+                            if (typeof msg[key] === 'string' && msg[key].startsWith('data:image/')) {
+                                return msg[key];
+                            }
+                        }
+                    }
+                    return null;
+                }
+
+                const imageSource = getImageSource(message);
+
+                if (imageSource) {
+                    messageHTML = `
+        <div class="flex ${estEnvoyeur ? 'justify-end' : 'justify-start'} mb-4">
+            <div class="max-w-[70%] ${estEnvoyeur ? 'bg-green-600' : 'bg-gray-600'} rounded-lg p-3">
+                <img src="${imageSource}" alt="Image" class="max-w-full rounded-lg">
+                <div class="text-xs text-white text-right mt-1">
+                    ${timestamp}
+                    ${estEnvoyeur ? '<i class="bx bx-check-double"></i>' : ''}
+                </div>
+            </div>
+        </div>
+    `;
+                } else {
+                    console.warn('Message image reçu sans données media valides:', message);
+
+                    console.log('Structure du message:', JSON.stringify(message, null, 2));
+
+                    messageHTML = this.createTextMessage(message, estEnvoyeur, timestamp);
+                }
+                break;
+
+            case 'video':
+
+                console.log('Message video complet:', message);
+
+
+                function getVideoSource(msg) {
+                    if (msg.media && msg.media.base64) {
+                        return { source: msg.media.base64, type: msg.media.type || 'video/mp4' };
+                    }
+                    if (msg.base64) {
+                        return { source: msg.base64, type: msg.type || 'video/mp4' };
+                    }
+                    if (msg.video) {
+                        return { source: msg.video, type: msg.type || 'video/mp4' };
+                    }
+
+                    if (typeof msg === 'object') {
+                        for (let key in msg) {
+                            if (typeof msg[key] === 'string' && msg[key].startsWith('data:video/')) {
+                                return { source: msg[key], type: msg.type || 'video/mp4' };
+                            }
+                        }
+                    }
+                    return null;
+                }
+
+                const videoData = getVideoSource(message);
+
+                if (videoData) {
+                    messageHTML = `
+        <div class="flex ${estEnvoyeur ? 'justify-end' : 'justify-start'} mb-4">
+            <div class="max-w-[70%] ${estEnvoyeur ? 'bg-green-600' : 'bg-gray-600'} rounded-lg p-3">
+                <video controls class="max-w-full rounded-lg">
+                    <source src="${videoData.source}" type="${videoData.type}">
+                    Votre navigateur ne supporte pas la lecture de vidéos.
+                </video>
+                <div class="text-xs text-white text-right mt-1">
+                    ${timestamp}
+                    ${estEnvoyeur ? '<i class="bx bx-check-double"></i>' : ''}
+                </div>
+            </div>
+        </div>
+    `;
+                } else {
+                    console.warn('Message vidéo reçu sans données media valides:', message);
+                    console.log('Structure du message:', JSON.stringify(message, null, 2));
+                    messageHTML = this.createTextMessage(message, estEnvoyeur, timestamp);
+                }
+                break;
+
+            default:
+                messageHTML = this.createTextMessage(message, estEnvoyeur, timestamp);
         }
 
-        this.scrollToBottom();
-    },
-
-    base64ToBlob(base64) {
-        const [header, data] = base64.split(',');
-        const bytes = atob(data);
-        const array = new Uint8Array(bytes.length);
-
-        for (let i = 0; i < bytes.length; i++) {
-            array[i] = bytes.charCodeAt(i);
+        const messagesContainer = document.querySelector('#messages');
+        if (messagesContainer) {
+            messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
-
-        return new Blob([array], { type: 'audio/mp3' });
     },
 
-    blobToBase64(blob) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
+    createTextMessage(message, estEnvoyeur, timestamp) {
+        return `
+        <div class="flex ${estEnvoyeur ? 'justify-end' : 'justify-start'} mb-4">
+            <div class="max-w-[70%] ${estEnvoyeur ? 'bg-green-600' : 'bg-gray-600'} rounded-lg p-3">
+                <p class="text-white">${message.texte || 'Message non disponible'}</p>
+                <div class="text-xs text-white text-right mt-1">
+                    ${timestamp}
+                    ${estEnvoyeur ? '<i class="bx bx-check-double"></i>' : ''}
+                </div>
+            </div>
+        </div>
+    `;
     },
 
     ajouterControlsAudio(messageElement) {
-        const audio = messageElement.querySelector('audio');
         const playBtn = messageElement.querySelector('.play-btn');
+        const audio = messageElement.querySelector('audio');
         const progressBar = messageElement.querySelector('.progress-bar');
-        const durationSpan = messageElement.querySelector('.duration');
+        const durationDisplay = messageElement.querySelector('.duration');
+
+        if (!playBtn || !audio || !progressBar || !durationDisplay) return;
+
         let isPlaying = false;
-        let audioDuration = 0;
-
-        const formatTime = (timeInSeconds) => {
-            if (isNaN(timeInSeconds) || !isFinite(timeInSeconds)) {
-                return '0:00';
-            }
-            const minutes = Math.floor(timeInSeconds / 60);
-            const seconds = Math.floor(timeInSeconds % 60);
-            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        };
-
-        audio.addEventListener('loadedmetadata', () => {
-            audioDuration = audio.duration;
-            durationSpan.textContent = formatTime(audioDuration);
-        });
-
-        audio.addEventListener('timeupdate', () => {
-            if (isNaN(audioDuration) || !isFinite(audioDuration)) return;
-            const progress = (audio.currentTime / audioDuration) * 100;
-            progressBar.style.width = `${progress}%`;
-            durationSpan.textContent = formatTime(audio.currentTime);
-
-            messageElement.dataset.progress = audio.currentTime;
-        });
-
-        const savedProgress = messageElement.dataset.progress;
-        if (savedProgress) {
-            audio.currentTime = parseFloat(savedProgress);
-            const progress = (audio.currentTime / audioDuration) * 100;
-            progressBar.style.width = `${progress}%`;
-            durationSpan.textContent = formatTime(audio.currentTime);
-        }
 
         playBtn.addEventListener('click', () => {
-            if (!audio.src) return;
-
             if (isPlaying) {
                 audio.pause();
                 playBtn.innerHTML = '<i class="bx bx-play-circle text-2xl"></i>';
             } else {
-                audio.play().catch(error => {
-                    console.error('Erreur de lecture audio:', error);
-                });
+                audio.play();
                 playBtn.innerHTML = '<i class="bx bx-pause-circle text-2xl"></i>';
             }
             isPlaying = !isPlaying;
+        });
+
+        audio.addEventListener('timeupdate', () => {
+            const progress = (audio.currentTime / audio.duration) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            const minutes = Math.floor(audio.currentTime / 60);
+            const seconds = Math.floor(audio.currentTime % 60);
+            durationDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
         });
 
         audio.addEventListener('ended', () => {
             isPlaying = false;
             playBtn.innerHTML = '<i class="bx bx-play-circle text-2xl"></i>';
             progressBar.style.width = '0%';
-            durationSpan.textContent = formatTime(audioDuration);
-            messageElement.dataset.progress = '0';
-        });
-
-        audio.addEventListener('error', (e) => {
-            console.error('Erreur audio:', e);
-            durationSpan.textContent = '0:00';
+            durationDisplay.textContent = '0:00';
         });
     }
-};
+}

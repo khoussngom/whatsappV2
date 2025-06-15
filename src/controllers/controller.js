@@ -14,6 +14,7 @@ import { NewGroupeClique } from './groupe.js';
 import { Recherche } from './recherche.js';
 import { messageVocal } from './messagesVocal.js';
 import { sendFichier } from '../components/componentSendFichier.js';
+import { selectFile } from './envoiePhotoVideo.js';
 
 const sendPlus = document.querySelector("#sendFichier");
 const popupConnexion = document.querySelector("#popupConnexion");
@@ -644,7 +645,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 sendPlus.addEventListener('click', (e) => {
-    sendPlus.style.rotate = (sendPlus.style.rotate === "45deg") ? "0deg" : "45deg";
+    // sendPlus.style.transform = (sendPlus.style.transform === 'rotate(45deg)') ? 'rotate(0deg)' : 'rotate(45deg)';
+    const bx = document.querySelector(".boxIm");
+    bx.style.transform = (bx.style.transform === 'rotate(45deg)') ? 'rotate(0deg)' : 'rotate(45deg)';
     const trigger = sendPlus;
     if (trigger) {
         e.preventDefault();
@@ -666,21 +669,19 @@ sendPlus.addEventListener('click', (e) => {
 
         const rect = trigger.getBoundingClientRect();
         const parentRect = trigger.closest('#sendFichier').getBoundingClientRect();
-
         menu.style.position = 'absolute';
-        menu.style.top = `${rect.top - (parentRect.bottom+380) }px`;
-        menu.style.right = `${(parentRect.left+25) - rect.right }px`;
-        menu.style.rotate = "-45deg"
+        menu.style.left = `${(rect.left+520) - parentRect.left}px`;
+        menu.style.bottom = `${parentRect.bottom - rect.top + 20}px`;
         menu.style.zIndex = '1000';
 
 
         trigger.closest('#sendFichier').appendChild(menu);
+        selectFile()
 
         const handleClickOutside = (event) => {
             if (!menu.contains(event.target) && !trigger.contains(event.target)) {
                 menu.remove();
                 document.removeEventListener('click', handleClickOutside);
-                sendPlus.style.rotate = "0deg";
                 trigger.style.backgroundColor = "";
             }
         };

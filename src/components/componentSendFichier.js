@@ -12,9 +12,9 @@ export const sendFichier = (() => ({
         </div>
         
         <!-- Photos et vidéos -->
-        <div class="flex items-center px-4 py-3 hover:bg-gray-700 cursor-pointer transition-colors">
+        <div id="mediaInpute" class="flex items-center px-4 py-3 hover:bg-gray-700 cursor-pointer transition-colors" data-action="photo-video">
             <div class="w-6 h-6 flex items-center justify-center mr-3">
-                <i class='bx bxs-image text-blue-400'></i>
+                <i class='bx bxs-image  text-blue-400'></i>
             </div>
             <span class="text-sm font-medium">Photos et vidéos</span>
         </div>
