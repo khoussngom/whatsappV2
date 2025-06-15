@@ -13,9 +13,9 @@ import { groupe } from '../components/componentGroupe.js';
 import { NewGroupeClique } from './groupe.js';
 import { Recherche } from './recherche.js';
 import { messageVocal } from './messagesVocal.js';
+import { sendFichier } from '../components/componentSendFichier.js';
 
-
-
+const sendPlus = document.querySelector("#sendFichier");
 const popupConnexion = document.querySelector("#popupConnexion");
 const btnConnexion = document.querySelector("#btnConnexion");
 const profil = document.querySelector("#profil");
@@ -641,4 +641,52 @@ nosMessages.addEventListener("click", () => {
 
 document.addEventListener('DOMContentLoaded', () => {
     messageVocal.ajouterInterfaceEnregistrement();
+});
+
+sendPlus.addEventListener('click', (e) => {
+    sendPlus.style.rotate = (sendPlus.style.rotate === "45deg") ? "0deg" : "45deg";
+    const trigger = sendPlus;
+    if (trigger) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const menuExistant = document.querySelector('.menu-plus');
+        if (menuExistant) {
+            menuExistant.remove();
+        }
+        trigger.style.backgroundColor = "green";
+        trigger.style.borderRadius = "50px"
+        trigger.style.width = trigger.style.height = "40px"
+        trigger.style.display = "flex";
+        trigger.style.justifyContent = "center";
+        trigger.style.alignItems = "center";
+        const menu = document.createElement('div');
+        menu.className = 'menu-plus';
+        menu.innerHTML = sendFichier.sendPlus();
+
+        const rect = trigger.getBoundingClientRect();
+        const parentRect = trigger.closest('#sendFichier').getBoundingClientRect();
+
+        menu.style.position = 'absolute';
+        menu.style.top = `${rect.bottom - (parentRect.bottom+420) }px`;
+        menu.style.right = `${(parentRect.left+25) - rect.right }px`;
+        menu.style.rotate = "-45deg"
+        menu.style.zIndex = '1000';
+
+
+        trigger.closest('#sendFichier').appendChild(menu);
+
+        const handleClickOutside = (event) => {
+            if (!menu.contains(event.target) && !trigger.contains(event.target)) {
+                menu.remove();
+                document.removeEventListener('click', handleClickOutside);
+                sendPlus.style.rotate = "0deg";
+                trigger.style.backgroundColor = "";
+            }
+        };
+
+        setTimeout(() => {
+            document.addEventListener('click', handleClickOutside);
+        }, 0);
+    }
 });
