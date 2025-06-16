@@ -82,7 +82,9 @@ export const model = (() => ({
             (element.prenom && element.prenom.toLowerCase().includes(cle)) ||
             (element.numero && element.numero.toLowerCase().includes(cle))
         );
-    }
+    },
+
+
 
 
 }))();

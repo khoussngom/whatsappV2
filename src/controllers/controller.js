@@ -584,8 +584,9 @@ document.addEventListener('click', async(e) => {
 
 profil.addEventListener("click", (e) => {
     if (e.target.id === 'profil' || e.target.closest("#profil")) {
+        const userId = sessionStorage.getItem("userId")
         gauche.innerHTML = "";
-        gauche.innerHTML = Profil.profil();
+        gauche.innerHTML = Profil.profil(userId);
 
         recharger()
     }
