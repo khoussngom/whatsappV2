@@ -9,14 +9,12 @@ export const BadgeController = (() => ({
             const response = await fetch(`${url}/${userId}`);
             const userData = await response.json();
 
-            // Mettre à jour les badges pour les contacts
             if (userData.contacts) {
                 userData.contacts.forEach(contact => {
                     BadgeNonLu.mettreAJourBadge(contact.id, contact.nbreNonLu || 0);
                 });
             }
 
-            // Mettre à jour les badges pour les groupes
             if (userData.groupes) {
                 userData.groupes.forEach(groupe => {
                     BadgeNonLu.mettreAJourBadge(groupe.id, groupe.nbreNonLu || 0);

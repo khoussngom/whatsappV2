@@ -6,12 +6,12 @@ export const Presence = (() => ({
                 En ligne
             </span>`;
         }
-        
+
         if (lastSeen) {
             const timeAgo = this.calculerTempsEcoule(lastSeen);
             return `<span class="text-gray-400 text-sm">Vu ${timeAgo}</span>`;
         }
-        
+
         return `<span class="text-gray-500 text-sm">Hors ligne</span>`;
     },
 
@@ -27,7 +27,7 @@ export const Presence = (() => ({
         if (diffMins < 60) return `il y a ${diffMins} min`;
         if (diffHours < 24) return `il y a ${diffHours}h`;
         if (diffDays < 7) return `il y a ${diffDays}j`;
-        
+
         return lastSeenDate.toLocaleDateString('fr-FR');
     },
 
@@ -39,15 +39,13 @@ export const Presence = (() => ({
     },
 
     demarrerSuiviPresence() {
-        // Simuler la présence en ligne
         setInterval(() => {
             const userId = sessionStorage.getItem("userId");
             if (userId) {
                 this.envoyerPresence(userId, true);
             }
-        }, 30000); // Toutes les 30 secondes
+        }, 30000);
 
-        // Détecter quand l'utilisateur quitte la page
         window.addEventListener('beforeunload', () => {
             const userId = sessionStorage.getItem("userId");
             if (userId) {
@@ -55,7 +53,6 @@ export const Presence = (() => ({
             }
         });
 
-        // Détecter la visibilité de la page
         document.addEventListener('visibilitychange', () => {
             const userId = sessionStorage.getItem("userId");
             if (userId) {

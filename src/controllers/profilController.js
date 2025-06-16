@@ -8,7 +8,7 @@ export const ProfilController = (() => ({
         try {
             const gauche = document.querySelector('#gauche');
             gauche.innerHTML = ProfilAvance.interfaceModification();
-            
+
             await this.chargerDonneesProfil();
             this.attacherEvenements();
         } catch (error) {
@@ -23,16 +23,14 @@ export const ProfilController = (() => ({
             const response = await fetch(`${url}/${userId}`);
             const userData = await response.json();
 
-            // Remplir les champs
             const nomInput = document.getElementById('nom-utilisateur');
             const statutInput = document.getElementById('statut-utilisateur');
             const presenceToggle = document.getElementById('toggle-presence');
 
             if (nomInput) nomInput.value = userData.nom || userData.prenom || '';
             if (statutInput) statutInput.value = userData.status || "Hey! J'utilise WhatsApp";
-            if (presenceToggle) presenceToggle.checked = userData.presence?.showOnline !== false;
+            if (presenceToggle) presenceToggle.checked = userData.presence && userData.presence.showOnline !== false;
 
-            // Charger l'avatar si disponible
             if (userData.avatar) {
                 const avatarPreview = document.getElementById('avatar-preview');
                 const avatarIcon = document.getElementById('avatar-icon');
@@ -48,24 +46,34 @@ export const ProfilController = (() => ({
     },
 
     attacherEvenements() {
-        // Retour
-        document.getElementById('retourProfil')?.addEventListener('click', () => {
-            window.location.reload();
-        });
+        const retourProfil = document.getElementById('retourProfil');
+        if (retourProfil) {
+            retourProfil.addEventListener('click', () => {
+                window.location.reload();
+            });
+        }
 
-        // Changer avatar
-        document.getElementById('changer-avatar')?.addEventListener('click', () => {
-            document.getElementById('avatar-input')?.click();
-        });
+        const changerAvatar = document.getElementById('changer-avatar');
+        if (changerAvatar) {
+            changerAvatar.addEventListener('click', () => {
+                const avatarInput = document.getElementById('avatar-input');
+                if (avatarInput) avatarInput.click();
+            });
+        }
 
-        document.getElementById('avatar-input')?.addEventListener('change', (e) => {
-            this.changerAvatar(e.target.files[0]);
-        });
+        const avatarInput = document.getElementById('avatar-input');
+        if (avatarInput) {
+            avatarInput.addEventListener('change', (e) => {
+                this.changerAvatar(e.target.files[0]);
+            });
+        }
 
-        // Sauvegarder
-        document.getElementById('sauvegarder-profil')?.addEventListener('click', () => {
-            this.sauvegarderProfil();
-        });
+        const sauvegarderProfil = document.getElementById('sauvegarder-profil');
+        if (sauvegarderProfil) {
+            sauvegarderProfil.addEventListener('click', () => {
+                this.sauvegarderProfil();
+            });
+        }
     },
 
     changerAvatar(file) {
@@ -80,7 +88,7 @@ export const ProfilController = (() => ({
         reader.onload = (e) => {
             const avatarPreview = document.getElementById('avatar-preview');
             const avatarIcon = document.getElementById('avatar-icon');
-            
+
             if (avatarPreview && avatarIcon) {
                 avatarPreview.src = e.target.result;
                 avatarPreview.classList.remove('hidden');
@@ -93,10 +101,15 @@ export const ProfilController = (() => ({
     async sauvegarderProfil() {
         try {
             const userId = sessionStorage.getItem("userId");
-            const nom = document.getElementById('nom-utilisateur')?.value.trim();
-            const statut = document.getElementById('statut-utilisateur')?.value.trim();
-            const showOnline = document.getElementById('toggle-presence')?.checked;
-            const avatarSrc = document.getElementById('avatar-preview')?.src;
+            const nomInput = document.getElementById('nom-utilisateur');
+            const statutInput = document.getElementById('statut-utilisateur');
+            const presenceToggle = document.getElementById('toggle-presence');
+            const avatarPreview = document.getElementById('avatar-preview');
+
+            const nom = nomInput ? nomInput.value.trim() : '';
+            const statut = statutInput ? statutInput.value.trim() : '';
+            const showOnline = presenceToggle ? presenceToggle.checked : false;
+            const avatarSrc = avatarPreview ? avatarPreview.src : '';
 
             const updateData = {
                 nom: nom || '',
@@ -108,7 +121,6 @@ export const ProfilController = (() => ({
                 }
             };
 
-            // Ajouter l'avatar s'il a été modifié
             if (avatarSrc && avatarSrc.startsWith('data:')) {
                 updateData.avatar = avatarSrc;
             }
@@ -122,8 +134,7 @@ export const ProfilController = (() => ({
             if (!response.ok) throw new Error('Erreur lors de la sauvegarde');
 
             popupMessage.message("Succès", "Profil mis à jour avec succès");
-            
-            // Retourner à l'écran principal après 2 secondes
+
             setTimeout(() => {
                 window.location.reload();
             }, 2000);

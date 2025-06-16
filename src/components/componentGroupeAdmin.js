@@ -1,13 +1,13 @@
 export const GroupeAdmin = (() => ({
-    gestionGroupe(groupeId, groupe) {
-        const userId = sessionStorage.getItem("userId");
-        const isAdmin = groupe.admin && groupe.admin.includes(userId);
-        
-        if (!isAdmin) {
-            return `<div class="text-center text-gray-500 p-4">Vous n'êtes pas administrateur de ce groupe</div>`;
-        }
+                gestionGroupe(groupeId, groupe) {
+                    const userId = sessionStorage.getItem("userId");
+                    const isAdmin = groupe.admin && groupe.admin.includes(userId);
 
-        return `
+                    if (!isAdmin) {
+                        return `<div class="text-center text-gray-500 p-4">Vous n'êtes pas administrateur de ce groupe</div>`;
+                    }
+
+                    return `
         <div class="bg-black text-white min-h-screen flex flex-col">
             <div class="bg-black px-4 py-3 flex items-center space-x-4 border-b border-gray-700">
                 <button id="retourGroupe" class="text-white">
@@ -39,16 +39,15 @@ export const GroupeAdmin = (() => ({
                 </div>
             </div>
         </div>`;
-    },
+                },
 
-    afficherMembres(groupe) {
-        const userId = sessionStorage.getItem("userId");
-        let membresHTML = '';
+                afficherMembres(groupe) {
+                    const userId = sessionStorage.getItem("userId");
+                    let membresHTML = '';
 
-        // Afficher les admins
-        if (groupe.admin) {
-            groupe.admin.forEach(adminId => {
-                membresHTML += `
+                    if (groupe.admin) {
+                        groupe.admin.forEach(adminId => {
+                                    membresHTML += `
                 <div class="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center">
@@ -69,7 +68,6 @@ export const GroupeAdmin = (() => ({
             });
         }
 
-        // Afficher les membres normaux
         if (groupe.membres) {
             groupe.membres.forEach(membreId => {
                 if (!groupe.admin || !groupe.admin.includes(membreId)) {
