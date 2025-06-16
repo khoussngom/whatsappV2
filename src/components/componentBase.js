@@ -9,6 +9,11 @@ export const Components = {
                         `<i class='bx bxs-user text-2xl text-white'></i>`
                     }
                 </div>
+                <!-- Indicateur de présence -->
+                ${chat.type !== 'groupe' ? `
+                <div class="user-status absolute -bottom-1 -right-1" data-user-id="${chat.id}">
+                    <div class="w-3 h-3 bg-gray-500 rounded-full border-2 border-black"></div>
+                </div>` : ''}
             </div>
             <div class="flex-1 min-w-0">
                 <div class="flex items-center justify-between mb-1">
@@ -32,11 +37,13 @@ export const Components = {
                     <div class="text-sm text-white truncate">
                         ${chat.lastMessage || ''}
                     </div>
-                    ${chat.nbreNonLu > 0 ? `
-                        <div class="bg-green-600 text-white rounded-full min-w-5 h-5 flex items-center justify-center text-xs font-medium px-1">
-                            ${chat.nbreNonLu}
-                        </div>` : ''
-                    }
+                    <div class="badge-container">
+                        ${chat.nbreNonLu > 0 ? `
+                            <div class="bg-green-600 text-white rounded-full min-w-5 h-5 flex items-center justify-center text-xs font-medium px-1 animate-pulse">
+                                ${chat.nbreNonLu > 99 ? '99+' : chat.nbreNonLu}
+                            </div>` : ''
+                        }
+                    </div>
                 </div>
             </div>
         </div>`;
@@ -53,6 +60,10 @@ export const Components = {
             <div class="menu-contextuel-option ${contact.blocked ? "debloquer-contact" : "bloquer-contact"}" data-chat-id="${chatId}">
                 <i class='bx bx-${contact.blocked ? "lock-open" : "lock"} mr-2'></i>${contact.blocked ? "Débloquer le contact" : "Bloquer le contact"}
             </div>
+            ${contact.type === 'groupe' ? `
+            <div class="menu-contextuel-option gerer-groupe" data-chat-id="${chatId}">
+                <i class='bx bx-cog mr-2'></i> Gérer le groupe
+            </div>` : ''}
         `;
     },
 

@@ -1,5 +1,5 @@
-import { MessagesController } from "./message";
-
+import { MessagesController } from "./message.js";
+import { PreviewController } from "./previewController.js";
 
 export function selectFile() {
     document.querySelector("#mediaInpute").addEventListener('click', (e) => {
@@ -9,53 +9,30 @@ export function selectFile() {
             mediaInput.click();
         }
     });
-
-
 }
 
 const mediaInput = document.querySelector('#mediaInput');
 mediaInput.addEventListener('change', async(e) => {
     const files = Array.from(e.target.files);
+    
+    if (files.length === 0) return;
 
-    for (const file of files) {
-        try {
-            if (file.size > 16 * 1024 * 1024) {
-                alert("Le fichier est trop volumineux. Taille maximum: 16MB");
-                continue;
-            }
-
-            const base64 = await fileToBase64(file);
-            const messageType = file.type.startsWith('image/') ? 'image' : 'video';
-
-            const nouveauMessage = {
-                type: messageType,
-                media: {
-                    base64: base64,
-                    type: file.type,
-                    name: file.name
-                }
-            };
-
-            await MessagesController.envoyerMessage('', messageType, nouveauMessage);
-
-            const menuPlus = document.querySelector('.menu-plus');
-            if (menuPlus) {
-                menuPlus.remove();
-            }
-            const sendPlus = document.querySelector('#sendFichier');
-            if (sendPlus) {
-                sendPlus.style.backgroundColor = "";
-                const bx = document.querySelector(".boxIm");
-                if (bx) {
-                    bx.style.transform = 'rotate(0deg)';
-                }
-            }
-
-        } catch (error) {
-            console.error("Erreur lors de l'envoi du média:", error);
+    // Vérifier la taille des fichiers
+    const oversizedFiles = files.filter(file => file.size > 16 * 1024 * 1024);
+    if (oversizedFiles.length > 0) {
+        alert(`${oversizedFiles.length} fichier(s) trop volumineux. Taille maximum: 16MB`);
+        // Filtrer les fichiers trop volumineux
+        const validFiles = files.filter(file => file.size <= 16 * 1024 * 1024);
+        if (validFiles.length === 0) {
+            e.target.value = '';
+            return;
         }
     }
 
+    // Afficher la prévisualisation
+    PreviewController.afficherPreview(files);
+    
+    // Réinitialiser l'input
     e.target.value = '';
 });
 
