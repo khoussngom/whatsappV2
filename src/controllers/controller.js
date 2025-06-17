@@ -633,9 +633,8 @@ parametre.addEventListener("click", () => {
 search.addEventListener("keyup", Recherche);
 
 document.addEventListener("click", (e) => {
-    const nosMessagesElement = document.getElementById("nosMessages");
 
-    if (nosMessagesElement && (e.target === nosMessagesElement || nosMessagesElement.contains(e.target))) {
+    if ((e.target.id === 'nosMessages') || (e.target.closest("#nosMessages"))) {
         MessagesController.afficherAllMessages();
     }
 });
