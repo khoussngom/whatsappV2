@@ -606,6 +606,7 @@ function recharger() {
         }
     });
 }
+recharger()
 
 function renderContactsUI() {
     gauche.innerHTML = layout.gauche();

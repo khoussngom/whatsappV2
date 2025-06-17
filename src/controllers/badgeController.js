@@ -31,12 +31,10 @@ export const BadgeController = (() => ({
             const response = await fetch(`${url}/${userId}`);
             const userData = await response.json();
 
-            // Chercher dans les contacts
             const contactIndex = userData.contacts.findIndex(c => c.id === chatId);
             if (contactIndex !== -1) {
                 userData.contacts[contactIndex].nbreNonLu = 0;
             } else {
-                // Chercher dans les groupes
                 const groupeIndex = userData.groupes.findIndex(g => g.id === chatId);
                 if (groupeIndex !== -1) {
                     userData.groupes[groupeIndex].nbreNonLu = 0;
@@ -61,13 +59,11 @@ export const BadgeController = (() => ({
             const response = await fetch(`${url}/${userId}`);
             const userData = await response.json();
 
-            // Chercher dans les contacts
             const contactIndex = userData.contacts.findIndex(c => c.id === chatId);
             if (contactIndex !== -1) {
                 userData.contacts[contactIndex].nbreNonLu = (userData.contacts[contactIndex].nbreNonLu || 0) + 1;
                 BadgeNonLu.mettreAJourBadge(chatId, userData.contacts[contactIndex].nbreNonLu);
             } else {
-                // Chercher dans les groupes
                 const groupeIndex = userData.groupes.findIndex(g => g.id === chatId);
                 if (groupeIndex !== -1) {
                     userData.groupes[groupeIndex].nbreNonLu = (userData.groupes[groupeIndex].nbreNonLu || 0) + 1;
