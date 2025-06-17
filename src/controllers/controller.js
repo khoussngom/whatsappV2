@@ -1,6 +1,6 @@
-import { Components } from '../components/componentBase.js';
-import { ComponentsAdd } from '../components/componentsAdd.js';
-import { ComponentController } from '../components/componentController.js';
+import { Components } from '../components/componentBase';
+import { ComponentsAdd } from '../components/componentsAdd';
+import { ComponentController } from '../components/componentController';
 import { MessagesController } from './message.js';
 import dbData from '../database/db.json';
 import { ServiceValidation } from '../services/service.js';
@@ -12,15 +12,8 @@ import { optionContact } from '../components/optionContact.js';
 import { groupe } from '../components/componentGroupe.js';
 import { NewGroupeClique } from './groupe.js';
 import { Recherche } from './recherche.js';
-import { messageVocal } from './messagesVocal.js';
-import { sendFichier } from '../components/componentSendFichier.js';
-import { selectFile } from './envoiePhotoVideo.js';
-import { GroupeAdminController } from './groupeAdmin.js';
-import { BadgeController } from './badgeController.js';
-import { ProfilController } from './profilController.js';
-import { Presence } from '../components/componentPresence.js';
 
-const sendPlus = document.querySelector("#sendFichier");
+
 const popupConnexion = document.querySelector("#popupConnexion");
 const btnConnexion = document.querySelector("#btnConnexion");
 const profil = document.querySelector("#profil");
@@ -33,6 +26,7 @@ const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs";
 // const url = "http://localhost:3000/utilisateurs";
 
 const search = document.querySelector("#recherche");
+
 
 const afficherErreur = (message, elementId) => {
     const errorElement = document.querySelector(`#${elementId}Error`);
@@ -72,12 +66,7 @@ const connexion = async(e) => {
                 prenom: "",
                 contacts: [],
                 groupes: [],
-                status: "Hey! J'utilise WhatsApp",
-                presence: {
-                    isOnline: true,
-                    showOnline: true,
-                    lastSeen: new Date().toISOString()
-                }
+                status: "Hey! J'utilise WhatsApp"
             };
 
             const createResponse = await fetch(url, {
@@ -92,6 +81,7 @@ const connexion = async(e) => {
 
             utilisateur = nouvelUtilisateur;
         } else {
+
             if (utilisateur.password !== password) {
                 throw new Error("Mot de passe incorrect");
             }
@@ -104,18 +94,13 @@ const connexion = async(e) => {
         popupConnexion.classList.replace("flex", "hidden");
         await contact.chargerDonnees();
         MessagesController.afficherAllMessages();
-        
-        // Démarrer le suivi de présence
-        Presence.demarrerSuiviPresence();
-        
-        // Mettre à jour les badges
-        BadgeController.mettreAJourBadges();
 
     } catch (error) {
         console.error("Erreur de connexion:", error);
         afficherErreur(error.message, 'username');
     }
 }
+
 
 const verifierConnexion = async function() {
     const est_connecte = sessionStorage.getItem("isLoggedIn");
@@ -125,16 +110,11 @@ const verifierConnexion = async function() {
         popupConnexion.classList.replace("flex", "hidden");
         try {
             await contact.chargerDonnees();
-            MessagesController.afficherAllMessages();
-            
-            // Démarrer le suivi de présence
-            Presence.demarrerSuiviPresence();
-            
-            // Mettre à jour les badges
-            BadgeController.mettreAJourBadges();
+            MessagesController.afficherAllMessages()
 
         } catch (error) {
             console.error("Erreur lors de la vérification:", error);
+
             sessionStorage.clear();
             popupConnexion.classList.replace("hidden", "flex");
         }
@@ -142,6 +122,8 @@ const verifierConnexion = async function() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+
+
     const formConnexion = document.querySelector("#formConnexion");
     if (formConnexion) {
         formConnexion.addEventListener("submit", connexion);
@@ -151,6 +133,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     verifierConnexion();
 });
+
+
 
 const ListeMessages = document.querySelector("#ListeMessages");
 let currentChatId = null;
@@ -166,15 +150,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    document.addEventListener('click', async (e) => {
+    document.addEventListener('click', (e) => {
         const chatItem = e.target.closest('.chat-item');
         if (chatItem) {
             const chatId = chatItem.dataset.chatId;
             MessagesController.definirChatActif(chatId);
             MessagesController.afficherConversation(chatId);
-            
-            // Marquer comme lu
-            await BadgeController.marquerCommeLu(chatId);
         }
     });
 
@@ -217,11 +198,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+
 document.addEventListener('click', async(e) => {
     const menuExistant = document.querySelector('.menu-contextuel');
     if (menuExistant && !e.target.closest('.menu-contextuel')) {
         menuExistant.remove();
     }
+
 
     const trigger = e.target.closest('.menu-trigger');
     if (trigger) {
@@ -236,9 +219,7 @@ document.addEventListener('click', async(e) => {
         const userId = sessionStorage.getItem("userId");
         const response = await fetch(`${url}/${userId}`);
         const userData = await response.json();
-        const contact = userData.contacts.find(c => c.id === chatId) || 
-                       userData.groupes.find(g => g.id === chatId);
-        
+        const contact = userData.contacts.find(c => c.id === chatId);
         const menu = document.createElement('div');
         menu.className = 'menu-contextuel';
         menu.innerHTML = Components.menuContextuel(chatId, contact);
@@ -250,11 +231,12 @@ document.addEventListener('click', async(e) => {
 
         trigger.closest('.chat-item').appendChild(menu);
 
-        menu.querySelector('.modifier-contact')?.addEventListener('click', () => {
+        menu.querySelector('.modifier-contact').addEventListener('click', () => {
             menu.remove();
         });
 
-        menu.querySelector('.supprimer-contact')?.addEventListener('click', async() => {
+        menu.querySelector('.supprimer-contact').addEventListener('click', async() => {
+
             try {
                 await supprimerContact(chatId);
                 menu.remove();
@@ -263,17 +245,9 @@ document.addEventListener('click', async(e) => {
                 console.error('Erreur lors de la suppression:', error);
             }
         });
-
-        // Gestion des groupes
-        const gererGroupeBtn = menu.querySelector('.gerer-groupe');
-        if (gererGroupeBtn) {
-            gererGroupeBtn.addEventListener('click', async() => {
-                menu.remove();
-                await GroupeAdminController.afficherGestionGroupe(chatId);
-            });
-        }
     }
 });
+
 
 optionDuContact.addEventListener("click", async(e) => {
     const trigger = optionDuContact;
@@ -332,6 +306,7 @@ optionDuContact.addEventListener("click", async(e) => {
         }, 100);
     }
 });
+
 
 document.body.addEventListener('click', async(e) => {
     if (e.target.closest('.modifier-contact')) ModifierContact(e);
@@ -452,7 +427,9 @@ function removeMenuContextuel() {
     if (menuContextuel) menuContextuel.remove();
 }
 
+
 document.addEventListener('DOMContentLoaded', () => {
+
     const formConnexion = document.querySelector("#formConnexion");
     if (formConnexion) {
         formConnexion.addEventListener("submit", connexion);
@@ -488,6 +465,8 @@ const FormContact = function(formContact) {
                 epingler: false,
                 nbreNonLu: 0,
                 messages: [],
+
+
             };
 
             try {
@@ -501,6 +480,7 @@ const FormContact = function(formContact) {
         });
     }
 }
+
 
 function NewContactClique() {
     const ListeMessages = document.querySelector('#ListeMessages');
@@ -520,6 +500,7 @@ function getChatIdFromEvent(e) {
     const element = e.target.closest('.modifier-contact');
     return element ? element.dataset.chatId : null;
 }
+
 
 function getContactById(id) {
     return dbData.contact.find(c => c.id === id);
@@ -559,6 +540,7 @@ function setupContactFormSubmit(chatId) {
     });
 }
 
+
 async function ModifierContactClick(e) {
     const chatId = getChatIdFromEvent(e);
     const contactToEdit = getContactById(chatId);
@@ -570,9 +552,11 @@ async function ModifierContactClick(e) {
     removeMenuContextuel();
 }
 
+
 function handleBackButtonClick() {
     MessagesController.afficherAllMessages();
 }
+
 
 document.addEventListener('click', async(e) => {
     if (e.target.id === 'newContact' || e.target.closest('#newContact')) {
@@ -592,9 +576,14 @@ document.addEventListener('click', async(e) => {
     }
 });
 
+
+
 profil.addEventListener("click", (e) => {
     if (e.target.id === 'profil' || e.target.closest("#profil")) {
-        ProfilController.afficherModificationProfil();
+        gauche.innerHTML = "";
+        gauche.innerHTML = Profil.profil();
+
+        recharger()
     }
 })
 
@@ -622,10 +611,12 @@ function attacherEventListener() {
             if (dbData.contact || dbData.groupe) {
                 ListeMessages.innerHTML = ComponentsAdd.nouveauMenu(dbData);
                 const liste = document.querySelector("#liste-Contacts");
+
             }
         });
     }
 }
+
 
 parametre.addEventListener("click", () => {
     gauche.innerHTML = layout.parametre();
@@ -641,56 +632,10 @@ parametre.addEventListener("click", () => {
 
 search.addEventListener("keyup", Recherche);
 
-nosMessages.addEventListener("click", () => {
-    MessagesController.afficherAllMessages();
-})
+document.addEventListener("click", (e) => {
+    const nosMessagesElement = document.getElementById("nosMessages");
 
-document.addEventListener('DOMContentLoaded', () => {
-    messageVocal.ajouterInterfaceEnregistrement();
-});
-
-sendPlus.addEventListener('click', (e) => {
-    const bx = document.querySelector(".boxIm");
-    bx.style.transform = (bx.style.transform === 'rotate(45deg)') ? 'rotate(0deg)' : 'rotate(45deg)';
-    const trigger = sendPlus;
-    if (trigger) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const menuExistant = document.querySelector('.menu-plus');
-        if (menuExistant) {
-            menuExistant.remove();
-        }
-        trigger.style.backgroundColor = "green";
-        trigger.style.borderRadius = "50px"
-        trigger.style.width = trigger.style.height = "40px"
-        trigger.style.display = "flex";
-        trigger.style.justifyContent = "center";
-        trigger.style.alignItems = "center";
-        const menu = document.createElement('div');
-        menu.className = 'menu-plus';
-        menu.innerHTML = sendFichier.sendPlus();
-
-        const rect = trigger.getBoundingClientRect();
-        const parentRect = trigger.closest('#sendFichier').getBoundingClientRect();
-        menu.style.position = 'absolute';
-        menu.style.left = `${(rect.left+520) - parentRect.left}px`;
-        menu.style.bottom = `${parentRect.bottom - rect.top + 20}px`;
-        menu.style.zIndex = '1000';
-
-        trigger.closest('#sendFichier').appendChild(menu);
-        selectFile()
-
-        const handleClickOutside = (event) => {
-            if (!menu.contains(event.target) && !trigger.contains(event.target)) {
-                menu.remove();
-                document.removeEventListener('click', handleClickOutside);
-                trigger.style.backgroundColor = "";
-            }
-        };
-
-        setTimeout(() => {
-            document.addEventListener('click', handleClickOutside);
-        }, 0);
+    if (nosMessagesElement && (e.target === nosMessagesElement || nosMessagesElement.contains(e.target))) {
+        MessagesController.afficherAllMessages();
     }
 });
