@@ -1,6 +1,6 @@
-import { Components } from '../components/componentBase';
-import { ComponentsAdd } from '../components/componentsAdd';
-import { ComponentController } from '../components/componentController';
+import { Components } from '../components/componentBase.js';
+import { ComponentsAdd } from '../components/componentsAdd.js';
+import { ComponentController } from '../components/componentController.js';
 import { MessagesController } from './message.js';
 import dbData from '../database/db.json';
 import { ServiceValidation } from '../services/service.js';
@@ -12,8 +12,15 @@ import { optionContact } from '../components/optionContact.js';
 import { groupe } from '../components/componentGroupe.js';
 import { NewGroupeClique } from './groupe.js';
 import { Recherche } from './recherche.js';
+import { messageVocal } from './messagesVocal.js';
+import { sendFichier } from '../components/componentSendFichier.js';
+import { selectFile } from './envoiePhotoVideo.js';
+import { GroupeAdminController } from './groupeAdmin.js';
+import { BadgeController } from './badgeController.js';
+import { ProfilController } from './profilController.js';
+import { Presence } from '../components/componentPresence.js';
 
-
+const sendPlus = document.querySelector("#sendFichier");
 const popupConnexion = document.querySelector("#popupConnexion");
 const btnConnexion = document.querySelector("#btnConnexion");
 const profil = document.querySelector("#profil");
@@ -26,7 +33,6 @@ const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs";
 // const url = "http://localhost:3000/utilisateurs";
 
 const search = document.querySelector("#recherche");
-
 
 const afficherErreur = (message, elementId) => {
     const errorElement = document.querySelector(`#${elementId}Error`);
@@ -66,7 +72,12 @@ const connexion = async(e) => {
                 prenom: "",
                 contacts: [],
                 groupes: [],
-                status: "Hey! J'utilise WhatsApp"
+                status: "Hey! J'utilise WhatsApp",
+                presence: {
+                    isOnline: true,
+                    showOnline: true,
+                    lastSeen: new Date().toISOString()
+                }
             };
 
             const createResponse = await fetch(url, {
@@ -81,7 +92,6 @@ const connexion = async(e) => {
 
             utilisateur = nouvelUtilisateur;
         } else {
-
             if (utilisateur.password !== password) {
                 throw new Error("Mot de passe incorrect");
             }
@@ -105,7 +115,6 @@ const connexion = async(e) => {
     }
 }
 
-
 const verifierConnexion = async function() {
     const est_connecte = sessionStorage.getItem("isLoggedIn");
     const userId = sessionStorage.getItem("userId");
@@ -122,7 +131,6 @@ const verifierConnexion = async function() {
 
         } catch (error) {
             console.error("Erreur lors de la vérification:", error);
-
             sessionStorage.clear();
             popupConnexion.classList.replace("hidden", "flex");
         }
@@ -130,8 +138,6 @@ const verifierConnexion = async function() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-
-
     const formConnexion = document.querySelector("#formConnexion");
     if (formConnexion) {
         formConnexion.addEventListener("submit", connexion);
@@ -141,8 +147,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     verifierConnexion();
 });
-
-
 
 const ListeMessages = document.querySelector("#ListeMessages");
 let currentChatId = null;
