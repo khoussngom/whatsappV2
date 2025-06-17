@@ -1,6 +1,6 @@
-import { Components } from '../components/componentBase';
-import { ComponentsAdd } from '../components/componentsAdd';
-import { ComponentController } from '../components/componentController';
+import { Components } from '../components/componentBase.js';
+import { ComponentsAdd } from '../components/componentsAdd.js';
+import { ComponentController } from '../components/componentController.js';
 import { MessagesController } from './message.js';
 import dbData from '../database/db.json';
 import { ServiceValidation } from '../services/service.js';
@@ -12,7 +12,15 @@ import { optionContact } from '../components/optionContact.js';
 import { groupe } from '../components/componentGroupe.js';
 import { NewGroupeClique } from './groupe.js';
 import { Recherche } from './recherche.js';
-
+import { EmojiPicker } from '../components/componentEmoji.js';
+import { StatutController } from './statutController.js';
+import { NotificationController } from './notificationController.js';
+import { Presence } from '../components/componentPresence.js';
+import { BadgeController } from './badgeController.js';
+import { ProfilController } from './profilController.js';
+import { sendFichier } from '../components/componentSendFichier.js';
+import { selectFile } from './envoiePhotoVideo.js';
+import { messageVocal } from './messagesVocal.js';
 
 const popupConnexion = document.querySelector("#popupConnexion");
 const btnConnexion = document.querySelector("#btnConnexion");
@@ -21,12 +29,10 @@ const gauche = document.querySelector("#gauche");
 const parametre = document.querySelector("#parametre");
 const optionDuContact = document.querySelector("#optionContact");
 const nosMessages = document.querySelector("#nosMessages");
+const sendPlus = document.querySelector("#sendFichier");
 
 const url = "https://backendwhatsapp-twxo.onrender.com/utilisateurs";
-// const url = "http://localhost:3000/utilisateurs";
-
 const search = document.querySelector("#recherche");
-
 
 const afficherErreur = (message, elementId) => {
     const errorElement = document.querySelector(`#${elementId}Error`);
@@ -55,18 +61,17 @@ const connexion = async(e) => {
         const utilisateurs = await response.json();
         let utilisateur = utilisateurs[0];
 
-        const userId = sessionStorage.getItem("userId");
-
         if (!utilisateur) {
             const nouvelUtilisateur = {
-                id: userId,
+                id: username,
                 numero: username,
                 password: password,
                 nom: "",
                 prenom: "",
                 contacts: [],
                 groupes: [],
-                status: "Hey! J'utilise WhatsApp"
+                status: "Hey! J'utilise WhatsApp",
+                monStatut: null
             };
 
             const createResponse = await fetch(url, {
@@ -81,7 +86,6 @@ const connexion = async(e) => {
 
             utilisateur = nouvelUtilisateur;
         } else {
-
             if (utilisateur.password !== password) {
                 throw new Error("Mot de passe incorrect");
             }
@@ -95,8 +99,9 @@ const connexion = async(e) => {
         await contact.chargerDonnees();
         MessagesController.afficherAllMessages();
 
+        // Initialiser les nouvelles fonctionnalités
+        await NotificationController.initialiser();
         Presence.demarrerSuiviPresence();
-
         BadgeController.mettreAJourBadges();
 
     } catch (error) {
@@ -104,7 +109,6 @@ const connexion = async(e) => {
         afficherErreur(error.message, 'username');
     }
 }
-
 
 const verifierConnexion = async function() {
     const est_connecte = sessionStorage.getItem("isLoggedIn");
@@ -116,13 +120,13 @@ const verifierConnexion = async function() {
             await contact.chargerDonnees();
             MessagesController.afficherAllMessages();
 
+            // Initialiser les nouvelles fonctionnalités
+            await NotificationController.initialiser();
             Presence.demarrerSuiviPresence();
-
             BadgeController.mettreAJourBadges();
 
         } catch (error) {
             console.error("Erreur lors de la vérification:", error);
-
             sessionStorage.clear();
             popupConnexion.classList.replace("hidden", "flex");
         }
@@ -130,19 +134,16 @@ const verifierConnexion = async function() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-
-
     const formConnexion = document.querySelector("#formConnexion");
     if (formConnexion) {
         formConnexion.addEventListener("submit", connexion);
-    } else {
-        console.error("Formulaire de connexion non trouvé");
     }
 
     verifierConnexion();
+    
+    // Initialiser le picker d'emoji
+    EmojiPicker.attacherEvenements();
 });
-
-
 
 const ListeMessages = document.querySelector("#ListeMessages");
 let currentChatId = null;
@@ -164,7 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const chatId = chatItem.dataset.chatId;
             MessagesController.definirChatActif(chatId);
             MessagesController.afficherConversation(chatId);
-
             await BadgeController.marquerCommeLu(chatId);
         }
     });
@@ -208,6 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Gestion des menus contextuels
 document.addEventListener('click', async(e) => {
     const menuExistant = document.querySelector('.menu-contextuel');
     if (menuExistant && !e.target.closest('.menu-contextuel')) {
@@ -240,36 +241,10 @@ document.addEventListener('click', async(e) => {
         menu.style.left = `${rect.left - parentRect.left}px`;
 
         trigger.closest('.chat-item').appendChild(menu);
-        const modifierBtn = menu.querySelector('.modifier-contact');
-        if (modifierBtn) {
-            modifierBtn.addEventListener('click', () => {
-                menu.remove();
-            });
-        }
-
-        const supprimerBtn = menu.querySelector('.supprimer-contact');
-        if (supprimerBtn) {
-            supprimerBtn.addEventListener('click', async() => {
-                try {
-                    await supprimerContact(chatId);
-                    menu.remove();
-                    MessagesController.afficherAllMessages();
-                } catch (error) {
-                    console.error('Erreur lors de la suppression:', error);
-                }
-            });
-        }
-
-        const gererGroupeBtn = menu.querySelector('.gerer-groupe');
-        if (gererGroupeBtn) {
-            gererGroupeBtn.addEventListener('click', async() => {
-                menu.remove();
-                await GroupeAdminController.afficherGestionGroupe(chatId);
-            });
-        }
     }
 });
 
+// Gestion des options de contact
 optionDuContact.addEventListener("click", async(e) => {
     const trigger = optionDuContact;
     if (trigger) {
@@ -310,9 +285,6 @@ optionDuContact.addEventListener("click", async(e) => {
         menu.style.position = "absolute";
         menu.style.zIndex = 1000;
 
-        if (e.target.closest('.bloquer-contact')) await BloquerContact(e);
-        if (e.target.closest('.debloquer-contact')) await DebloquerContact(e);
-
         trigger.closest('#optionContact').appendChild(menu);
 
         const ClickOutside = (event) => {
@@ -328,6 +300,7 @@ optionDuContact.addEventListener("click", async(e) => {
     }
 });
 
+// Gestion des actions sur les contacts
 document.body.addEventListener('click', async(e) => {
     if (e.target.closest('.modifier-contact')) ModifierContact(e);
     if (e.target.closest('.bloquer-contact')) await BloquerContact(e);
@@ -337,6 +310,7 @@ document.body.addEventListener('click', async(e) => {
     if (e.target.id === 'confirmer-suppression') await ConfirmerSuppression(e);
 });
 
+// Fonctions utilitaires pour la gestion des contacts
 function ModifierContact(e) {
     const chatId = e.target.closest('.modifier-contact').dataset.chatId;
     const contactToEdit = dbData.contact.find(c => c.id === chatId);
@@ -363,7 +337,7 @@ function setupFormModification(chatId) {
             id: chatId,
             prenom: formData.get('prenom'),
             nom: formData.get('nom'),
-            numero: formData.get('telephone')
+            numero: formData.get('numero')
         };
         try {
             const success = await contact.modifierContact(chatId, contactModifie);
@@ -447,25 +421,7 @@ function removeMenuContextuel() {
     if (menuContextuel) menuContextuel.remove();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const formConnexion = document.querySelector("#formConnexion");
-    if (formConnexion) {
-        formConnexion.addEventListener("submit", connexion);
-    } else {
-        console.error("Formulaire de connexion non trouvé");
-    }
-
-    verifierConnexion();
-});
-
-document.addEventListener('click', (e) => {
-    const chatItem = e.target.closest('.chat-item');
-    if (chatItem) {
-        const chatId = chatItem.dataset.chatId;
-        MessagesController.afficherConversation(chatId);
-    }
-});
-
+// Gestion des nouveaux contacts et groupes
 const FormContact = function(formContact) {
     if (formContact) {
         formContact.addEventListener('submit', async(e) => {
@@ -511,88 +467,6 @@ function NewContactClique() {
     }
 }
 
-function getChatIdFromEvent(e) {
-    const element = e.target.closest('.modifier-contact');
-    return element ? element.dataset.chatId : null;
-}
-
-function getContactById(id) {
-    return dbData.contact.find(c => c.id === id);
-}
-
-function renderEditContactForm(contact) {
-    const ListeMessages = document.querySelector('#ListeMessages');
-    ListeMessages.innerHTML = Components.AjoutContact({
-        mode: 'edition',
-        contact: contact
-    });
-}
-
-function setupContactFormSubmit(chatId) {
-    const formContact = document.querySelector('#form-contact');
-    if (!formContact) return;
-
-    formContact.addEventListener('submit', async(e) => {
-        e.preventDefault();
-        const formData = new FormData(formContact);
-
-        const contactModifie = {
-            id: chatId,
-            numero: formData.get('numero'),
-            prenom: formData.get('prenom'),
-            nom: formData.get('nom')
-        };
-
-        try {
-            const success = await contact.modifierContact(chatId, contactModifie);
-            if (success) {
-                MessagesController.afficherAllMessages();
-            }
-        } catch (error) {
-            console.error('Erreur lors de la modification:', error);
-        }
-    });
-}
-
-async function ModifierContactClick(e) {
-    const chatId = getChatIdFromEvent(e);
-    const contactToEdit = getContactById(chatId);
-    if (!contactToEdit) return;
-
-    renderEditContactForm(contactToEdit);
-    setupContactFormSubmit(chatId);
-    setupRetourListeClick();
-    removeMenuContextuel();
-}
-
-function handleBackButtonClick() {
-    MessagesController.afficherAllMessages();
-}
-
-document.addEventListener('click', async(e) => {
-    if (e.target.id === 'newContact' || e.target.closest('#newContact')) {
-        NewContactClique();
-    }
-
-    if (e.target.id === 'creationGroupe' || e.target.closest('#creationGroupe')) {
-        NewGroupeClique(recharger);
-    }
-
-    if (e.target.closest('.modifier-contact')) {
-        await ModifierContactClick(e);
-    }
-
-    if (e.target.id === 'backButton' || e.target.closest('#backButton')) {
-        handleBackButtonClick();
-    }
-});
-
-profil.addEventListener("click", (e) => {
-    if (e.target.id === 'profil' || e.target.closest("#profil")) {
-        ProfilController.afficherModificationProfil();
-    }
-})
-
 function recharger() {
     document.addEventListener('click', function handleRetour(e) {
         const retourBtn = e.target.closest('#retour');
@@ -616,11 +490,31 @@ function attacherEventListener() {
         addButton.addEventListener('click', () => {
             if (dbData.contact || dbData.groupe) {
                 ListeMessages.innerHTML = ComponentsAdd.nouveauMenu(dbData);
-                const liste = document.querySelector("#liste-Contacts");
             }
         });
     }
 }
+
+// Événements principaux
+document.addEventListener('click', async(e) => {
+    if (e.target.id === 'newContact' || e.target.closest('#newContact')) {
+        NewContactClique();
+    }
+
+    if (e.target.id === 'creationGroupe' || e.target.closest('#creationGroupe')) {
+        NewGroupeClique(recharger);
+    }
+
+    if (e.target.id === 'backButton' || e.target.closest('#backButton')) {
+        MessagesController.afficherAllMessages();
+    }
+});
+
+profil.addEventListener("click", (e) => {
+    if (e.target.id === 'profil' || e.target.closest("#profil")) {
+        ProfilController.afficherModificationProfil();
+    }
+});
 
 parametre.addEventListener("click", () => {
     gauche.innerHTML = layout.parametre();
@@ -629,21 +523,31 @@ parametre.addEventListener("click", () => {
     const BtnDeconnexion = () => {
         sessionStorage.removeItem('isLoggedIn');
         sessionStorage.removeItem('username');
+        sessionStorage.removeItem('userId');
         popupConnexion.classList.replace("hidden", "flex");
     };
     logoutBtn.addEventListener('click', BtnDeconnexion);
-})
+});
 
 search.addEventListener("keyup", Recherche);
 
 nosMessages.addEventListener("click", () => {
     MessagesController.afficherAllMessages();
-})
+});
 
+// Gestion des statuts
+document.addEventListener('click', (e) => {
+    if (e.target.closest('#statuts') || e.target.id === 'statuts') {
+        StatutController.afficherStatuts();
+    }
+});
+
+// Initialisation des messages vocaux
 document.addEventListener('DOMContentLoaded', () => {
     messageVocal.ajouterInterfaceEnregistrement();
 });
 
+// Gestion du menu d'envoi de fichiers
 sendPlus.addEventListener('click', (e) => {
     const bx = document.querySelector(".boxIm");
     bx.style.transform = (bx.style.transform === 'rotate(45deg)') ? 'rotate(0deg)' : 'rotate(45deg)';
@@ -656,12 +560,14 @@ sendPlus.addEventListener('click', (e) => {
         if (menuExistant) {
             menuExistant.remove();
         }
+        
         trigger.style.backgroundColor = "green";
-        trigger.style.borderRadius = "50px"
-        trigger.style.width = trigger.style.height = "40px"
+        trigger.style.borderRadius = "50px";
+        trigger.style.width = trigger.style.height = "40px";
         trigger.style.display = "flex";
         trigger.style.justifyContent = "center";
         trigger.style.alignItems = "center";
+        
         const menu = document.createElement('div');
         menu.className = 'menu-plus';
         menu.innerHTML = sendFichier.sendPlus();
@@ -674,7 +580,7 @@ sendPlus.addEventListener('click', (e) => {
         menu.style.zIndex = '1000';
 
         trigger.closest('#sendFichier').appendChild(menu);
-        selectFile()
+        selectFile();
 
         const handleClickOutside = (event) => {
             if (!menu.contains(event.target) && !trigger.contains(event.target)) {
