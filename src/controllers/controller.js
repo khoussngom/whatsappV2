@@ -104,11 +104,9 @@ const connexion = async(e) => {
         popupConnexion.classList.replace("flex", "hidden");
         await contact.chargerDonnees();
         MessagesController.afficherAllMessages();
-        
-        // Démarrer le suivi de présence
+
         Presence.demarrerSuiviPresence();
-        
-        // Mettre à jour les badges
+
         BadgeController.mettreAJourBadges();
 
     } catch (error) {
@@ -126,11 +124,9 @@ const verifierConnexion = async function() {
         try {
             await contact.chargerDonnees();
             MessagesController.afficherAllMessages();
-            
-            // Démarrer le suivi de présence
+
             Presence.demarrerSuiviPresence();
-            
-            // Mettre à jour les badges
+
             BadgeController.mettreAJourBadges();
 
         } catch (error) {
@@ -166,14 +162,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    document.addEventListener('click', async (e) => {
+    document.addEventListener('click', async(e) => {
         const chatItem = e.target.closest('.chat-item');
         if (chatItem) {
             const chatId = chatItem.dataset.chatId;
             MessagesController.definirChatActif(chatId);
             MessagesController.afficherConversation(chatId);
-            
-            // Marquer comme lu
+
             await BadgeController.marquerCommeLu(chatId);
         }
     });
@@ -236,9 +231,9 @@ document.addEventListener('click', async(e) => {
         const userId = sessionStorage.getItem("userId");
         const response = await fetch(`${url}/${userId}`);
         const userData = await response.json();
-        const contact = userData.contacts.find(c => c.id === chatId) || 
-                       userData.groupes.find(g => g.id === chatId);
-        
+        const contact = userData.contacts.find(c => c.id === chatId) ||
+            userData.groupes.find(g => g.id === chatId);
+
         const menu = document.createElement('div');
         menu.className = 'menu-contextuel';
         menu.innerHTML = Components.menuContextuel(chatId, contact);
@@ -249,22 +244,26 @@ document.addEventListener('click', async(e) => {
         menu.style.left = `${rect.left - parentRect.left}px`;
 
         trigger.closest('.chat-item').appendChild(menu);
-
-        menu.querySelector('.modifier-contact')?.addEventListener('click', () => {
-            menu.remove();
-        });
-
-        menu.querySelector('.supprimer-contact')?.addEventListener('click', async() => {
-            try {
-                await supprimerContact(chatId);
+        const modifierBtn = menu.querySelector('.modifier-contact');
+        if (modifierBtn) {
+            modifierBtn.addEventListener('click', () => {
                 menu.remove();
-                MessagesController.afficherAllMessages();
-            } catch (error) {
-                console.error('Erreur lors de la suppression:', error);
-            }
-        });
+            });
+        }
 
-        // Gestion des groupes
+        const supprimerBtn = menu.querySelector('.supprimer-contact');
+        if (supprimerBtn) {
+            supprimerBtn.addEventListener('click', async() => {
+                try {
+                    await supprimerContact(chatId);
+                    menu.remove();
+                    MessagesController.afficherAllMessages();
+                } catch (error) {
+                    console.error('Erreur lors de la suppression:', error);
+                }
+            });
+        }
+
         const gererGroupeBtn = menu.querySelector('.gerer-groupe');
         if (gererGroupeBtn) {
             gererGroupeBtn.addEventListener('click', async() => {
