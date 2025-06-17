@@ -8,7 +8,7 @@ export const StatutController = (() => ({
         try {
             const gauche = document.querySelector('#gauche');
             gauche.innerHTML = StatutComponent.creerInterfaceStatut();
-            
+
             await this.chargerStatuts();
             this.attacherEvenements();
         } catch (error) {
@@ -20,54 +20,96 @@ export const StatutController = (() => ({
         try {
             const userId = sessionStorage.getItem("userId");
             const response = await fetch(`${url}/${userId}`);
+
+            if (!response.ok) {
+                throw new Error('Erreur lors du chargement des données utilisateur');
+            }
+
             const userData = await response.json();
 
-            // Charger mon statut
+            // Afficher mon statut
             if (userData.monStatut && !this.estExpire(userData.monStatut)) {
                 const monStatutTexte = document.getElementById('monStatutTexte');
                 if (monStatutTexte) {
-                    monStatutTexte.textContent = userData.monStatut.type === 'texte' ? 
+                    monStatutTexte.textContent = userData.monStatut.type === 'texte' ?
                         userData.monStatut.contenu : 'Photo';
+                }
+
+                const monStatutRing = document.querySelector('.statut-ring');
+                if (monStatutRing) {
+                    monStatutRing.classList.add('nouveau');
                 }
             }
 
-            // Charger les statuts des contacts
             const listeStatuts = document.getElementById('listeStatuts');
             if (listeStatuts && userData.contacts) {
                 let statutsHTML = '';
-                
                 for (const contact of userData.contacts) {
-                    const contactResponse = await fetch(`${url}/${contact.id}`);
-                    const contactData = await contactResponse.json();
-                    
-                    if (contactData.monStatut && !this.estExpire(contactData.monStatut)) {
+                    if (!contact || !contact.id) continue;
+
+                    try {
+                        const response = await fetch(`${url}/${contact.id}`);
+
+                        if (response.status === 404) {
+                            console.info(`Contact ${contact.id} non trouvé dans la base de données`);
+                            continue;
+                        }
+
+                        if (!response.ok) {
+                            console.warn(`Erreur lors du chargement du statut pour ${contact.id}`);
+                            continue;
+                        }
+
+                        const contactData = await response.json();
+                        if (!contactData.monStatut || this.estExpire(contactData.monStatut)) continue;
+
+                        const estVu = contactData.monStatut.vues.includes(userId);
                         statutsHTML += StatutComponent.afficherStatut({
                             id: contactData.monStatut.id,
-                            auteur: `${contact.prenom} ${contact.nom}`,
-                            timestamp: contactData.monStatut.timestamp
+                            auteur: `${contact.prenom || ''} ${contact.nom || contact.id}`,
+                            timestamp: contactData.monStatut.timestamp,
+                            estVu: estVu,
+                            contenu: contactData.monStatut.contenu,
+                            type: contactData.monStatut.type
                         });
+                    } catch (error) {
+                        console.info(`Contact ignoré ${contact.id}:`, error.message);
+                        continue;
                     }
                 }
-                
-                listeStatuts.innerHTML = statutsHTML || '<div class="text-gray-500 text-center">Aucun statut récent</div>';
+
+
+                listeStatuts.innerHTML = statutsHTML || '<div class="text-gray-500 text-center p-4">Aucun statut récent</div>';
             }
+
         } catch (error) {
             console.error('Erreur lors du chargement des statuts:', error);
+            const listeStatuts = document.getElementById('listeStatuts');
+            if (listeStatuts) {
+                listeStatuts.innerHTML = '<div class="text-red-500 text-center p-4">Erreur lors du chargement des statuts</div>';
+            }
         }
     },
 
     attacherEvenements() {
-        // Retour
-        document.getElementById('retourStatut')?.addEventListener('click', () => {
-            window.location.reload();
-        });
+        const retourStatut = document.getElementById('retourStatut');
+        if (retourStatut) {
+            retourStatut.addEventListener('click', () => {
+                const gauche = document.querySelector('#gauche');
+                if (gauche) {
+                    gauche.innerHTML = Components.layout.gauche();
+                    MessagesController.afficherAllMessages();
+                }
+            });
+        }
 
-        // Ajouter statut
-        document.getElementById('ajouterStatut')?.addEventListener('click', () => {
-            this.afficherFormulaireStatut();
-        });
+        const ajouterStatut = document.getElementById('ajouterStatut');
+        if (ajouterStatut) {
+            ajouterStatut.addEventListener('click', () => {
+                this.afficherFormulaireStatut();
+            });
+        }
 
-        // Voir statut
         document.addEventListener('click', (e) => {
             const statutItem = e.target.closest('.statut-item');
             if (statutItem) {
@@ -81,19 +123,19 @@ export const StatutController = (() => ({
         const formulaire = StatutComponent.creerFormulaireStatut();
         document.body.insertAdjacentHTML('beforeend', formulaire);
 
-        // Événements du formulaire
+
         this.attacherEvenementsFormulaire();
     },
 
     attacherEvenementsFormulaire() {
-        // Type de statut
+
         document.querySelectorAll('.statut-type-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.statut-type-btn').forEach(b => {
                     b.classList.remove('bg-green-600');
                     b.classList.add('bg-gray-600');
                 });
-                
+
                 e.target.classList.remove('bg-gray-600');
                 e.target.classList.add('bg-green-600');
 
@@ -103,41 +145,58 @@ export const StatutController = (() => ({
             });
         });
 
-        // Choisir image
-        document.getElementById('choisir-image')?.addEventListener('click', () => {
-            document.getElementById('image-statut').click();
-        });
+        const choisirImageBtn = document.getElementById('choisir-image');
+        if (choisirImageBtn) {
+            choisirImageBtn.addEventListener('click', () => {
+                const imageInput = document.getElementById('image-statut');
+                if (imageInput) {
+                    imageInput.click();
+                }
+            });
+        }
 
-        document.getElementById('image-statut')?.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const preview = document.getElementById('preview-image');
-                    const img = document.getElementById('image-preview');
-                    img.src = e.target.result;
-                    preview.classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+        const imageStatutInput = document.getElementById('image-statut');
+        if (imageStatutInput) {
+            imageStatutInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const preview = document.getElementById('preview-image');
+                        const img = document.getElementById('image-preview');
+                        if (img && preview) {
+                            img.src = e.target.result;
+                            preview.classList.remove('hidden');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
 
-        // Annuler
-        document.getElementById('annuler-statut')?.addEventListener('click', () => {
-            document.getElementById('formulaire-statut')?.remove();
-        });
+        const annulerStatutBtn = document.getElementById('annuler-statut');
+        if (annulerStatutBtn) {
+            annulerStatutBtn.addEventListener('click', () => {
+                const formulaireStatut = document.getElementById('formulaire-statut');
+                if (formulaireStatut) {
+                    formulaireStatut.remove();
+                }
+            });
+        }
 
-        // Publier
-        document.getElementById('publier-statut')?.addEventListener('click', () => {
-            this.publierStatut();
-        });
+        const publierStatutBtn = document.getElementById('publier-statut');
+        if (publierStatutBtn) {
+            publierStatutBtn.addEventListener('click', () => {
+                this.publierStatut();
+            });
+        }
     },
 
     async publierStatut() {
         try {
             const typeActif = document.querySelector('.statut-type-btn.bg-green-600').dataset.type;
             const duree = parseInt(document.getElementById('duree-statut').value);
-            
+
             let contenu = '';
             if (typeActif === 'texte') {
                 contenu = document.getElementById('texte-statut').value.trim();
@@ -175,10 +234,13 @@ export const StatutController = (() => ({
                 body: JSON.stringify({ monStatut: nouveauStatut })
             });
 
-            document.getElementById('formulaire-statut')?.remove();
+            const formulaireStatut = document.getElementById('formulaire-statut');
+            if (formulaireStatut) {
+                formulaireStatut.remove();
+            }
             NotificationComponent.creerNotificationInterne('Statut publié avec succès', 'success');
-            
-            // Recharger les statuts
+
+
             await this.chargerStatuts();
 
         } catch (error) {
@@ -189,11 +251,11 @@ export const StatutController = (() => ({
 
     estExpire(statut) {
         if (!statut || !statut.timestamp || !statut.duree) return true;
-        
+
         const maintenant = new Date();
         const dateStatut = new Date(statut.timestamp);
-        const dureeMs = statut.duree * 60 * 60 * 1000; // Convertir heures en millisecondes
-        
+        const dureeMs = statut.duree * 60 * 60 * 1000;
+
         return (maintenant - dateStatut) > dureeMs;
     },
 

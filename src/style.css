@@ -28,3 +28,51 @@
     visibility: hidden;
     opacity: 0;
 }
+
+
+/* Styles pour l'anneau de statut */
+
+.statut-ring {
+    position: relative;
+    width: 64px;
+    height: 64px;
+}
+
+.statut-ring .progress-ring {
+    fill: none;
+    stroke: #00a884;
+    stroke-width: 2;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    stroke-dasharray: 189;
+    stroke-dashoffset: 0;
+    animation: progress 24h linear;
+}
+
+@keyframes progress {
+    from {
+        stroke-dashoffset: 0;
+    }
+    to {
+        stroke-dashoffset: 189;
+    }
+}
+
+
+/* Style pour la bordure verte quand il y a un nouveau statut non vu */
+
+.statut-ring.nouveau .progress-ring {
+    stroke: #00a884;
+    animation: none;
+    stroke-dashoffset: 0;
+}
+
+
+/* Style pour la bordure grise quand le statut a été vu */
+
+.statut-ring.vu .progress-ring {
+    stroke: #374151;
+    animation: none;
+    stroke-dashoffset: 0;
+}
