@@ -16,3 +16,15 @@
         opacity: 1;
     }
 }
+
+.emoji-picker {
+    z-index: 1000;
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.emoji-picker.hidden {
+    visibility: hidden;
+    opacity: 0;
+}

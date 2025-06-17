@@ -14,14 +14,12 @@ export function selectFile() {
 const mediaInput = document.querySelector('#mediaInput');
 mediaInput.addEventListener('change', async(e) => {
     const files = Array.from(e.target.files);
-    
+
     if (files.length === 0) return;
 
-    // Vérifier la taille des fichiers
     const oversizedFiles = files.filter(file => file.size > 16 * 1024 * 1024);
     if (oversizedFiles.length > 0) {
         alert(`${oversizedFiles.length} fichier(s) trop volumineux. Taille maximum: 16MB`);
-        // Filtrer les fichiers trop volumineux
         const validFiles = files.filter(file => file.size <= 16 * 1024 * 1024);
         if (validFiles.length === 0) {
             e.target.value = '';
@@ -29,10 +27,8 @@ mediaInput.addEventListener('change', async(e) => {
         }
     }
 
-    // Afficher la prévisualisation
     PreviewController.afficherPreview(files);
-    
-    // Réinitialiser l'input
+
     e.target.value = '';
 });
 

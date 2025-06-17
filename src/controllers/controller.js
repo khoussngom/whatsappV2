@@ -99,7 +99,6 @@ const connexion = async(e) => {
         await contact.chargerDonnees();
         MessagesController.afficherAllMessages();
 
-        // Initialiser les nouvelles fonctionnalités
         await NotificationController.initialiser();
         Presence.demarrerSuiviPresence();
         BadgeController.mettreAJourBadges();
@@ -120,7 +119,6 @@ const verifierConnexion = async function() {
             await contact.chargerDonnees();
             MessagesController.afficherAllMessages();
 
-            // Initialiser les nouvelles fonctionnalités
             await NotificationController.initialiser();
             Presence.demarrerSuiviPresence();
             BadgeController.mettreAJourBadges();
@@ -140,9 +138,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     verifierConnexion();
-    
-    // Initialiser le picker d'emoji
-    EmojiPicker.attacherEvenements();
+
+    const emojiContainer = document.querySelector('#emoji-picker-container');
+    if (emojiContainer) {
+        emojiContainer.innerHTML = EmojiPicker.creerPicker();
+        EmojiPicker.attacherEvenements();
+    }
 });
 
 const ListeMessages = document.querySelector("#ListeMessages");
@@ -244,7 +245,6 @@ document.addEventListener('click', async(e) => {
     }
 });
 
-// Gestion des options de contact
 optionDuContact.addEventListener("click", async(e) => {
     const trigger = optionDuContact;
     if (trigger) {
@@ -300,7 +300,6 @@ optionDuContact.addEventListener("click", async(e) => {
     }
 });
 
-// Gestion des actions sur les contacts
 document.body.addEventListener('click', async(e) => {
     if (e.target.closest('.modifier-contact')) ModifierContact(e);
     if (e.target.closest('.bloquer-contact')) await BloquerContact(e);
@@ -310,7 +309,6 @@ document.body.addEventListener('click', async(e) => {
     if (e.target.id === 'confirmer-suppression') await ConfirmerSuppression(e);
 });
 
-// Fonctions utilitaires pour la gestion des contacts
 function ModifierContact(e) {
     const chatId = e.target.closest('.modifier-contact').dataset.chatId;
     const contactToEdit = dbData.contact.find(c => c.id === chatId);
@@ -421,7 +419,6 @@ function removeMenuContextuel() {
     if (menuContextuel) menuContextuel.remove();
 }
 
-// Gestion des nouveaux contacts et groupes
 const FormContact = function(formContact) {
     if (formContact) {
         formContact.addEventListener('submit', async(e) => {
@@ -495,7 +492,6 @@ function attacherEventListener() {
     }
 }
 
-// Événements principaux
 document.addEventListener('click', async(e) => {
     if (e.target.id === 'newContact' || e.target.closest('#newContact')) {
         NewContactClique();
@@ -535,19 +531,16 @@ nosMessages.addEventListener("click", () => {
     MessagesController.afficherAllMessages();
 });
 
-// Gestion des statuts
 document.addEventListener('click', (e) => {
     if (e.target.closest('#statuts') || e.target.id === 'statuts') {
         StatutController.afficherStatuts();
     }
 });
 
-// Initialisation des messages vocaux
 document.addEventListener('DOMContentLoaded', () => {
     messageVocal.ajouterInterfaceEnregistrement();
 });
 
-// Gestion du menu d'envoi de fichiers
 sendPlus.addEventListener('click', (e) => {
     const bx = document.querySelector(".boxIm");
     bx.style.transform = (bx.style.transform === 'rotate(45deg)') ? 'rotate(0deg)' : 'rotate(45deg)';
@@ -560,14 +553,14 @@ sendPlus.addEventListener('click', (e) => {
         if (menuExistant) {
             menuExistant.remove();
         }
-        
+
         trigger.style.backgroundColor = "green";
         trigger.style.borderRadius = "50px";
         trigger.style.width = trigger.style.height = "40px";
         trigger.style.display = "flex";
         trigger.style.justifyContent = "center";
         trigger.style.alignItems = "center";
-        
+
         const menu = document.createElement('div');
         menu.className = 'menu-plus';
         menu.innerHTML = sendFichier.sendPlus();

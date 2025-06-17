@@ -19,7 +19,7 @@ export const NotificationComponent = (() => ({
 
     async afficherNotification(titre, options = {}) {
         const hasPermission = await this.demanderPermission();
-        
+
         if (!hasPermission) {
             console.log("Permission de notification refusée");
             return;
@@ -36,7 +36,7 @@ export const NotificationComponent = (() => ({
 
         try {
             const notification = new Notification(titre, defaultOptions);
-            
+
             notification.onclick = () => {
                 window.focus();
                 notification.close();
@@ -90,7 +90,7 @@ export const NotificationComponent = (() => ({
             type === 'error' ? 'bg-red-600' : 
             type === 'warning' ? 'bg-yellow-600' : 'bg-blue-600'
         } text-white`;
-        
+
         notification.innerHTML = `
             <div class="flex items-center space-x-2">
                 <i class='bx ${
@@ -107,12 +107,10 @@ export const NotificationComponent = (() => ({
 
         document.body.appendChild(notification);
 
-        // Animation d'entrée
         setTimeout(() => {
             notification.style.transform = 'translateX(0)';
         }, 100);
 
-        // Auto-suppression après 5 secondes
         setTimeout(() => {
             notification.style.transform = 'translateX(full)';
             setTimeout(() => {

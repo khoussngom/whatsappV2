@@ -9,7 +9,7 @@ export const GroupeAdminController = (() => ({
             const userId = sessionStorage.getItem("userId");
             const response = await fetch(`${url}/${userId}`);
             const userData = await response.json();
-            
+
             const groupe = userData.groupes.find(g => g.id === groupeId);
             if (!groupe) {
                 throw new Error('Groupe non trouvé');
@@ -17,7 +17,7 @@ export const GroupeAdminController = (() => ({
 
             const gauche = document.querySelector('#gauche');
             gauche.innerHTML = GroupeAdmin.gestionGroupe(groupeId, groupe);
-            
+
             this.attacherEvenements(groupeId, groupe);
         } catch (error) {
             console.error('Erreur lors de l\'affichage de la gestion:', error);
@@ -26,40 +26,39 @@ export const GroupeAdminController = (() => ({
     },
 
     attacherEvenements(groupeId, groupe) {
-        // Retour
-        document.getElementById('retourGroupe')?.addEventListener('click', () => {
-            // Retourner à la liste des messages
-            window.location.reload();
-        });
+        const retourBtn = document.getElementById('retourGroupe');
+        if (retourBtn) {
+            retourBtn.addEventListener('click', () => {
+                window.location.reload();
+            });
+        }
 
-        // Promouvoir admin
-        document.addEventListener('click', async (e) => {
-            if (e.target.closest('.promouvoir-admin')) {
-                const memberId = e.target.closest('.promouvoir-admin').dataset.memberId;
+        document.addEventListener('click', async(e) => {
+            const promouvoirBtn = e.target.closest('.promouvoir-admin');
+            if (promouvoirBtn) {
+                const memberId = promouvoirBtn.dataset.memberId;
                 await this.promouvoirAdmin(groupeId, memberId);
             }
-        });
 
-        // Retirer admin
-        document.addEventListener('click', async (e) => {
-            if (e.target.closest('.retirer-admin')) {
-                const memberId = e.target.closest('.retirer-admin').dataset.memberId;
+            const retirerAdminBtn = e.target.closest('.retirer-admin');
+            if (retirerAdminBtn) {
+                const memberId = retirerAdminBtn.dataset.memberId;
                 await this.retirerAdmin(groupeId, memberId);
             }
-        });
 
-        // Retirer membre
-        document.addEventListener('click', async (e) => {
-            if (e.target.closest('.retirer-membre')) {
-                const memberId = e.target.closest('.retirer-membre').dataset.memberId;
+            const retirerMembreBtn = e.target.closest('.retirer-membre');
+            if (retirerMembreBtn) {
+                const memberId = retirerMembreBtn.dataset.memberId;
                 await this.retirerMembre(groupeId, memberId);
             }
         });
 
-        // Modifier nom du groupe
-        document.getElementById('modifierNomGroupe')?.addEventListener('click', () => {
-            this.afficherPopupModifierNom(groupeId, groupe.nom);
-        });
+        const modifierNomBtn = document.getElementById('modifierNomGroupe');
+        if (modifierNomBtn) {
+            modifierNomBtn.addEventListener('click', () => {
+                this.afficherPopupModifierNom(groupeId, groupe.nom);
+            });
+        }
     },
 
     async promouvoirAdmin(groupeId, memberId) {
@@ -67,14 +66,14 @@ export const GroupeAdminController = (() => ({
             const userId = sessionStorage.getItem("userId");
             const response = await fetch(`${url}/${userId}`);
             const userData = await response.json();
-            
+
             const groupeIndex = userData.groupes.findIndex(g => g.id === groupeId);
             if (groupeIndex === -1) throw new Error('Groupe non trouvé');
 
             if (!userData.groupes[groupeIndex].admin) {
                 userData.groupes[groupeIndex].admin = [];
             }
-            
+
             if (!userData.groupes[groupeIndex].admin.includes(memberId)) {
                 userData.groupes[groupeIndex].admin.push(memberId);
             }
@@ -85,9 +84,8 @@ export const GroupeAdminController = (() => ({
                 body: JSON.stringify({ groupes: userData.groupes })
             });
 
-            // Recharger l'interface
             this.afficherGestionGroupe(groupeId);
-            
+
             popupMessage.message("Succès", `${memberId} est maintenant administrateur`);
         } catch (error) {
             console.error('Erreur lors de la promotion:', error);
@@ -100,7 +98,7 @@ export const GroupeAdminController = (() => ({
             const userId = sessionStorage.getItem("userId");
             const response = await fetch(`${url}/${userId}`);
             const userData = await response.json();
-            
+
             const groupeIndex = userData.groupes.findIndex(g => g.id === groupeId);
             if (groupeIndex === -1) throw new Error('Groupe non trouvé');
 
@@ -114,9 +112,8 @@ export const GroupeAdminController = (() => ({
                 body: JSON.stringify({ groupes: userData.groupes })
             });
 
-            // Recharger l'interface
             this.afficherGestionGroupe(groupeId);
-            
+
             popupMessage.message("Succès", `${memberId} n'est plus administrateur`);
         } catch (error) {
             console.error('Erreur lors de la rétrogradation:', error);
@@ -129,16 +126,14 @@ export const GroupeAdminController = (() => ({
             const userId = sessionStorage.getItem("userId");
             const response = await fetch(`${url}/${userId}`);
             const userData = await response.json();
-            
+
             const groupeIndex = userData.groupes.findIndex(g => g.id === groupeId);
             if (groupeIndex === -1) throw new Error('Groupe non trouvé');
 
-            // Retirer des membres
             if (userData.groupes[groupeIndex].membres) {
                 userData.groupes[groupeIndex].membres = userData.groupes[groupeIndex].membres.filter(id => id !== memberId);
             }
 
-            // Retirer des admins aussi si c'était un admin
             if (userData.groupes[groupeIndex].admin) {
                 userData.groupes[groupeIndex].admin = userData.groupes[groupeIndex].admin.filter(id => id !== memberId);
             }
@@ -149,9 +144,8 @@ export const GroupeAdminController = (() => ({
                 body: JSON.stringify({ groupes: userData.groupes })
             });
 
-            // Recharger l'interface
             this.afficherGestionGroupe(groupeId);
-            
+
             popupMessage.message("Succès", `${memberId} a été retiré du groupe`);
         } catch (error) {
             console.error('Erreur lors de la suppression:', error);
@@ -163,18 +157,26 @@ export const GroupeAdminController = (() => ({
         const popup = GroupeAdmin.popupModifierNom(nomActuel);
         document.body.insertAdjacentHTML('beforeend', popup);
 
-        // Événements du popup
-        document.getElementById('annuler-modification')?.addEventListener('click', () => {
-            document.getElementById('popup-modifier-nom')?.remove();
-        });
+        const annulerBtn = document.getElementById('annuler-modification');
+        if (annulerBtn) {
+            annulerBtn.addEventListener('click', () => {
+                const popupElem = document.getElementById('popup-modifier-nom');
+                if (popupElem) popupElem.remove();
+            });
+        }
 
-        document.getElementById('confirmer-modification')?.addEventListener('click', async () => {
-            const nouveauNom = document.getElementById('nouveauNomGroupe')?.value.trim();
-            if (nouveauNom) {
-                await this.modifierNomGroupe(groupeId, nouveauNom);
-                document.getElementById('popup-modifier-nom')?.remove();
-            }
-        });
+        const confirmerBtn = document.getElementById('confirmer-modification');
+        if (confirmerBtn) {
+            confirmerBtn.addEventListener('click', async() => {
+                const nouveauNomInput = document.getElementById('nouveauNomGroupe');
+                const nouveauNom = nouveauNomInput ? nouveauNomInput.value.trim() : '';
+                if (nouveauNom) {
+                    await this.modifierNomGroupe(groupeId, nouveauNom);
+                    const popupElem = document.getElementById('popup-modifier-nom');
+                    if (popupElem) popupElem.remove();
+                }
+            });
+        }
     },
 
     async modifierNomGroupe(groupeId, nouveauNom) {
@@ -182,7 +184,7 @@ export const GroupeAdminController = (() => ({
             const userId = sessionStorage.getItem("userId");
             const response = await fetch(`${url}/${userId}`);
             const userData = await response.json();
-            
+
             const groupeIndex = userData.groupes.findIndex(g => g.id === groupeId);
             if (groupeIndex === -1) throw new Error('Groupe non trouvé');
 
@@ -194,9 +196,8 @@ export const GroupeAdminController = (() => ({
                 body: JSON.stringify({ groupes: userData.groupes })
             });
 
-            // Recharger l'interface
             this.afficherGestionGroupe(groupeId);
-            
+
             popupMessage.message("Succès", "Nom du groupe modifié avec succès");
         } catch (error) {
             console.error('Erreur lors de la modification:', error);
