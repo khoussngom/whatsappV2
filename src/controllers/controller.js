@@ -12,6 +12,7 @@ import { optionContact } from '../components/optionContact.js';
 import { groupe } from '../components/componentGroupe.js';
 import { NewGroupeClique } from './groupe.js';
 import { Recherche } from './recherche.js';
+<<<<<<< HEAD
 import { EmojiPicker } from '../components/componentEmoji.js';
 import { StatutController } from './statutController.js';
 import { NotificationController } from './notificationController.js';
@@ -22,6 +23,17 @@ import { sendFichier } from '../components/componentSendFichier.js';
 import { selectFile } from './envoiePhotoVideo.js';
 import { messageVocal } from './messagesVocal.js';
 
+=======
+import { messageVocal } from './messagesVocal.js';
+import { sendFichier } from '../components/componentSendFichier.js';
+import { selectFile } from './envoiePhotoVideo.js';
+import { GroupeAdminController } from './groupeAdmin.js';
+import { BadgeController } from './badgeController.js';
+import { ProfilController } from './profilController.js';
+import { Presence } from '../components/componentPresence.js';
+
+const sendPlus = document.querySelector("#sendFichier");
+>>>>>>> 83caae3822b048a58fe2b6cf25ff277dee863a27
 const popupConnexion = document.querySelector("#popupConnexion");
 const btnConnexion = document.querySelector("#btnConnexion");
 const profil = document.querySelector("#profil");
@@ -71,7 +83,15 @@ const connexion = async(e) => {
                 contacts: [],
                 groupes: [],
                 status: "Hey! J'utilise WhatsApp",
+<<<<<<< HEAD
                 monStatut: null
+=======
+                presence: {
+                    isOnline: true,
+                    showOnline: true,
+                    lastSeen: new Date().toISOString()
+                }
+>>>>>>> 83caae3822b048a58fe2b6cf25ff277dee863a27
             };
 
             const createResponse = await fetch(url, {
@@ -473,6 +493,7 @@ function recharger() {
         }
     });
 }
+recharger()
 
 function renderContactsUI() {
     gauche.innerHTML = layout.gauche();
